@@ -1,0 +1,25 @@
+project:
+  type: website
+  output-dir: docs
+  resources:
+    - resume.pdf
+    - bella.png
+
+website:
+  title: "Yizhen Shi"
+  navbar:
+    left:
+      - href: index.qmd
+        text: About Me
+      - href: resume.qmd
+        text: Resume
+      - href: blog.qmd
+        text: Blog
+  search: false
+
+format:
+  html:
+    theme:
+      - cosmo
+    css: styles.css
+    toc: false

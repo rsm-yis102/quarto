@@ -1,0 +1,73 @@
+---
+title: "Yizhen Shi"
+about:
+  template: jolla
+  image: bella.png
+  links:
+    - icon: envelope
+      text: Email
+      href: mailto:yis102@ucsd.edu
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/yizhen-shi-aab405382/
+    - icon: file-earmark-text
+      text: Resume
+      href: resume.pdf
+---
+
+Hi, I'm **Yizhen Shi**, an **MSBA student at UC San Diego** focused on **marketing analytics** and **data-driven decision making**.
+
+## Current
+
+- Master of Science in Business Analytics, **UC San Diego Rady School of Management**
+- Data Analytics Consultant, **Feedback Loop (EduSourced)**
+- Data Engineering Intern, **Checkit Analytics**
+
+## Interests
+
+- Data Analysis
+- Customer Segmentation
+- Machine Learning
+- Customer Analytics
+- Predictive Modeling
+
+## Work Experience
+
+### Feedback Loop (EduSourced) | 2026–Present
+- Analyze survey and usage data to uncover user engagement patterns and improve product adoption.
+- Develop engagement metrics and segment users into cohorts to identify at-risk users.
+- Build interactive dashboards to support marketing and customer success decision-making.
+
+### Checkit Analytics | 2026–Present
+- Build and maintain Python-based data pipelines for FDA drug approvals and clinical pipeline data.
+- Design relational database schemas in PostgreSQL and perform SQL-based data quality checks.
+- Improve pipeline reliability with anomaly detection and consistency checks.
+
+### Equity Methods | 2026
+- Built multi-scenario Excel models for stock-based compensation tax impacts.
+- Analyzed grant and exercise datasets in SAS for SEC Pay Versus Performance reporting.
+- Developed PVP proxy tables and graphical disclosure outputs.
+
+## Projects
+
+### Customer Churn Prediction
+- Built Logistic Regression and Random Forest models to predict churn.
+- Applied SHAP, permutation importance, and PDP for interpretation.
+- Quantified retention strategy impact through targeting and CLV analysis.
+
+### SQL & ETL Project
+- Built an automated ETL/ELT pipeline in Snowflake using Python and SQL.
+- Integrated CSV, XML, Postgres, and Snowflake Marketplace data sources.
+- Reduced manual setup time by 90% with reproducible automation scripts.
+
+## Education
+
+- **M.S. in Business Analytics**, UC San Diego, expected **Dec 2026**
+- **B.S. in Finance**, Arizona State University, **May 2025**, GPA **3.81**
+
+## Skills
+
+- **Programming:** Python, SQL, R, SAS
+- **Analytics:** Scikit-learn, NLP, Deep Learning, Tableau
+- **Tools:** Excel, Git, Docker, AWS EC2
+- **AI/ML Systems:** OpenAI, Gemini, RAG

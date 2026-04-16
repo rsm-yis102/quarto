@@ -1,0 +1,17 @@
+{
+  "hash": "b1b23e397c6fb663d17d50cc2a3f36dc",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Analysis of Cars\"\nauthor: \"Yizhen Shi\"\ndate: \"2026-04-04\"\n---\n\n# Header\n\nLet's investigate the relationship between fuel efficiency (`mpg`) and engine displacement (`disp`) from the `mtcars` dataset. Those variables have a correlation of -0.85.\n\n## Sub-Header\n\nHere is a plot:\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(tidyverse)\ndata(mtcars)\nmtcars |>\n  ggplot(aes(mpg, disp)) +\n  geom_point(color=\"dodgerblue4\", size=2)\n```\n\n::: {.cell-output-display}\n![](first-post_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n:::\n\n",
+    "supporting": [
+      "first-post_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
