@@ -110,5 +110,68 @@
     "title": "About",
     "section": "",
     "text": "About this site"
+  },
+  {
+    "objectID": "blog/second-post.html",
+    "href": "blog/second-post.html",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "",
+    "text": "Card and Krueger (1994) study whether increasing the minimum wage reduces employment in the fast-food industry. In April 1992, New Jersey raised its minimum wage while neighboring Pennsylvania did not. This policy change creates a natural experiment: New Jersey is the treatment group and Pennsylvania is the control group.\nThe paper uses a difference-in-differences design. The main idea is to compare the change in employment in New Jersey before and after the policy change to the corresponding change in Pennsylvania. If the two states would otherwise have followed similar trends, then the difference in these changes can be interpreted as the causal effect of the minimum wage increase.\nIn this post, I replicate part of Table 2, the 9 numbers in rows 1-3 and columns 1-3 of Table 3, and column (i) of Table 4."
+  },
+  {
+    "objectID": "blog/second-post.html#introduction",
+    "href": "blog/second-post.html#introduction",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "",
+    "text": "Card and Krueger (1994) study whether increasing the minimum wage reduces employment in the fast-food industry. In April 1992, New Jersey raised its minimum wage while neighboring Pennsylvania did not. This policy change creates a natural experiment: New Jersey is the treatment group and Pennsylvania is the control group.\nThe paper uses a difference-in-differences design. The main idea is to compare the change in employment in New Jersey before and after the policy change to the corresponding change in Pennsylvania. If the two states would otherwise have followed similar trends, then the difference in these changes can be interpreted as the causal effect of the minimum wage increase.\nIn this post, I replicate part of Table 2, the 9 numbers in rows 1-3 and columns 1-3 of Table 3, and column (i) of Table 4."
+  },
+  {
+    "objectID": "blog/second-post.html#load-packages-and-data",
+    "href": "blog/second-post.html#load-packages-and-data",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Load Packages and Data",
+    "text": "Load Packages and Data\n\nimport pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom pathlib import Path\n\n\ndata_path = Path(\"public.dat\")\nprint(\"Does public.dat exist?\", data_path.exists())\n\nDoes public.dat exist? True\n\n\n\ncolspecs = [\n    (0,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21),\n    (22,24),(25,30),(31,36),(37,42),(43,48),(49,54),(55,60),(61,62),(63,68),\n    (69,70),(71,76),(77,82),(83,88),(89,94),(95,100),(101,103),(104,106),\n    (107,108),(109,110),(111,117),(118,120),(121,126),(127,132),(133,138),\n    (139,144),(145,150),(151,156),(157,158),(159,160),(161,166),(167,172),\n    (173,178),(179,184),(185,190),(191,193),(194,196)\n]\n\ncolnames = [\n    \"sheet\",\"chain\",\"co_owned\",\"state\",\n    \"southj\",\"centralj\",\"northj\",\"pa1\",\"pa2\",\"shore\",\n    \"ncalls\",\"empft\",\"emppt\",\"nmgrs\",\"wage_st\",\"inctime\",\"firstinc\",\"bonus\",\"pctaff\",\n    \"meals\",\"open\",\"hrsopen\",\"psoda\",\"pfry\",\"pentree\",\"nregs\",\"nregs11\",\n    \"type2\",\"status2\",\"date2\",\"ncalls2\",\"empft2\",\"emppt2\",\"nmgrs2\",\n    \"wage_st2\",\"inctime2\",\"firstin2\",\"special2\",\"meals2\",\"open2r\",\"hrsopen2\",\n    \"psoda2\",\"pfry2\",\"pentree2\",\"nregs2\",\"nregs112\"\n]\n\ndf = pd.read_fwf(data_path, colspecs=colspecs, names=colnames)\n\nfor c in df.columns:\n    df[c] = pd.to_numeric(df[c], errors=\"coerce\")\n\ndf.head()\n\n\n\n\n\n\n\n\nsheet\nchain\nco_owned\nstate\nsouthj\ncentralj\nnorthj\npa1\npa2\nshore\n...\nfirstin2\nspecial2\nmeals2\nopen2r\nhrsopen2\npsoda2\npfry2\npentree2\nnregs2\nnregs112\n\n\n\n\n0\n46\n1\n0\n0\n0\n0\n0\n1\n0\n0\n...\n0.08\n1.0\n2.0\n6.5\n16.5\n1.03\nNaN\n0.94\n4.0\n4.0\n\n\n1\n49\n2\n0\n0\n0\n0\n0\n1\n0\n0\n...\n0.05\n0.0\n2.0\n10.0\n13.0\n1.01\n0.89\n2.35\n4.0\n4.0\n\n\n2\n506\n2\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.25\nNaN\n1.0\n11.0\n11.0\n0.95\n0.74\n2.33\n4.0\n3.0\n\n\n3\n56\n4\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.15\n0.0\n2.0\n10.0\n12.0\n0.92\n0.79\n0.87\n2.0\n2.0\n\n\n4\n61\n4\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.15\n0.0\n2.0\n10.0\n12.0\n1.01\n0.84\n0.95\n2.0\n2.0\n\n\n\n\n5 rows × 46 columns"
+  },
+  {
+    "objectID": "blog/second-post.html#variable-construction",
+    "href": "blog/second-post.html#variable-construction",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Variable Construction",
+    "text": "Variable Construction\nThe paper defines full-time-equivalent employment as the number of full-time workers plus half the number of part-time workers.\n\ndf[\"fte\"] = df[\"empft\"] + 0.5 * df[\"emppt\"]\ndf[\"fte2\"] = df[\"empft2\"] + 0.5 * df[\"emppt2\"]\n\ndf[\"nj\"] = df[\"state\"]\n\ndf[\"fullmeal\"] = df[\"psoda\"] + df[\"pfry\"] + df[\"pentree\"]\ndf[\"fullmeal2\"] = df[\"psoda2\"] + df[\"pfry2\"] + df[\"pentree2\"]\n\nFor now, I use the reported wave-2 employment directly.\n\ndf[\"fte2_main\"] = df[\"fte2\"]\ndf[\"delta_fte\"] = df[\"fte2_main\"] - df[\"fte\"]\n\ndf[[\"fte\", \"fte2_main\", \"delta_fte\", \"nj\"]].describe()\n\n\n\n\n\n\n\n\nfte\nfte2_main\ndelta_fte\nnj\n\n\n\n\ncount\n404.000000\n397.000000\n391.000000\n410.000000\n\n\nmean\n17.621906\n17.566751\n-0.119565\n0.807317\n\n\nstd\n9.423264\n8.607385\n8.850644\n0.394888\n\n\nmin\n3.000000\n0.000000\n-43.500000\n0.000000\n\n\n25%\n11.375000\n11.500000\n-4.250000\n1.000000\n\n\n50%\n16.375000\n17.000000\n0.000000\n1.000000\n\n\n75%\n21.000000\n22.500000\n4.125000\n1.000000\n\n\nmax\n80.000000\n55.500000\n35.000000\n1.000000"
+  },
+  {
+    "objectID": "blog/second-post.html#replicate-part-of-table-2",
+    "href": "blog/second-post.html#replicate-part-of-table-2",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Replicate Part of Table 2",
+    "text": "Replicate Part of Table 2\nI replicate selected descriptive statistics from Table 2: FTE employment, starting wage, and full meal price in each state and survey wave.\n\ntable2_wave1 = (\n    df.groupby(\"nj\")\n      .agg(\n          fte_wave1=(\"fte\", \"mean\"),\n          start_wage_wave1=(\"wage_st\", \"mean\"),\n          fullmeal_wave1=(\"fullmeal\", \"mean\")\n      )\n)\n\ntable2_wave2 = (\n    df.groupby(\"nj\")\n      .agg(\n          fte_wave2=(\"fte2_main\", \"mean\"),\n          start_wage_wave2=(\"wage_st2\", \"mean\"),\n          fullmeal_wave2=(\"fullmeal2\", \"mean\")\n      )\n)\n\ntable2_rep = table2_wave1.join(table2_wave2)\ntable2_rep.index = [\"PA\", \"NJ\"]\ntable2_rep.round(2)\n\n\n\n\n\n\n\n\nfte_wave1\nstart_wage_wave1\nfullmeal_wave1\nfte_wave2\nstart_wage_wave2\nfullmeal_wave2\n\n\n\n\nPA\n19.95\n4.63\n3.04\n17.54\n4.62\n3.03\n\n\nNJ\n17.07\n4.61\n3.35\n17.57\n5.08\n3.41"
+  },
+  {
+    "objectID": "blog/second-post.html#replicate-table-3-rows-1-3-columns-1-3",
+    "href": "blog/second-post.html#replicate-table-3-rows-1-3-columns-1-3",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Replicate Table 3: Rows 1-3, Columns 1-3",
+    "text": "Replicate Table 3: Rows 1-3, Columns 1-3\nThe key result in Table 3 compares average FTE employment in Pennsylvania and New Jersey before and after the minimum wage increase.\n\npa = df[df[\"nj\"] == 0]\nnj = df[df[\"nj\"] == 1]\n\nr1_pa = pa[\"fte\"].mean()\nr1_nj = nj[\"fte\"].mean()\nr1_diff = r1_nj - r1_pa\n\nr2_pa = pa[\"fte2_main\"].mean()\nr2_nj = nj[\"fte2_main\"].mean()\nr2_diff = r2_nj - r2_pa\n\nr3_pa = r2_pa - r1_pa\nr3_nj = r2_nj - r1_nj\nr3_diff = r3_nj - r3_pa\n\ntable3_rep = pd.DataFrame({\n    \"PA (i)\": [r1_pa, r2_pa, r3_pa],\n    \"NJ (ii)\": [r1_nj, r2_nj, r3_nj],\n    \"Difference NJ-PA (iii)\": [r1_diff, r2_diff, r3_diff]\n}, index=[\n    \"1. FTE employment before\",\n    \"2. FTE employment after\",\n    \"3. Change in mean FTE employment\"\n])\n\ntable3_rep.round(2)\n\n\n\n\n\n\n\n\nPA (i)\nNJ (ii)\nDifference NJ-PA (iii)\n\n\n\n\n1. FTE employment before\n19.95\n17.07\n-2.88\n\n\n2. FTE employment after\n17.54\n17.57\n0.03\n\n\n3. Change in mean FTE employment\n-2.41\n0.51\n2.91\n\n\n\n\n\n\n\nThe third row, third column is the main difference-in-differences estimate. The difference-in-differences estimate (approximately 2.7) indicates that employment increased in New Jersey relative to Pennsylvania after the minimum wage increase."
+  },
+  {
+    "objectID": "blog/second-post.html#replicate-table-4-column-i",
+    "href": "blog/second-post.html#replicate-table-4-column-i",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Replicate Table 4, Column (i)",
+    "text": "Replicate Table 4, Column (i)\nTable 4 column (i) regresses the change in FTE employment on a New Jersey dummy. Following the paper, I restrict the sample to stores with nonmissing employment and starting wage data in both waves.\n\nreg_df = df[\n    df[\"fte\"].notna() &\n    df[\"fte2_main\"].notna() &\n    df[\"wage_st\"].notna() &\n    df[\"wage_st2\"].notna()\n].copy()\n\nreg_df[\"delta_fte\"] = reg_df[\"fte2_main\"] - reg_df[\"fte\"]\n\nX = sm.add_constant(reg_df[\"nj\"])\ny = reg_df[\"delta_fte\"]\n\nmodel1 = sm.OLS(y, X).fit()\nprint(model1.summary())\n\n                            OLS Regression Results                            \n==============================================================================\nDep. Variable:              delta_fte   R-squared:                       0.012\nModel:                            OLS   Adj. R-squared:                  0.010\nMethod:                 Least Squares   F-statistic:                     4.476\nDate:                Tue, 21 Apr 2026   Prob (F-statistic):             0.0351\nTime:                        19:46:04   Log-Likelihood:                -1274.5\nNo. Observations:                 358   AIC:                             2553.\nDf Residuals:                     356   BIC:                             2561.\nDf Model:                           1                                         \nCovariance Type:            nonrobust                                         \n==============================================================================\n                 coef    std err          t      P&gt;|t|      [0.025      0.975]\n------------------------------------------------------------------------------\nconst         -2.1343      1.042     -2.048      0.041      -4.184      -0.084\nnj             2.4462      1.156      2.116      0.035       0.172       4.720\n==============================================================================\nOmnibus:                       49.222   Durbin-Watson:                   2.164\nProb(Omnibus):                  0.000   Jarque-Bera (JB):              145.478\nSkew:                          -0.613   Prob(JB):                     2.57e-32\nKurtosis:                       5.872   Cond. No.                         4.42\n==============================================================================\n\nNotes:\n[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n\n\n\ntable4_col1 = pd.DataFrame({\n    \"Coefficient\": model1.params,\n    \"Std. Error\": model1.bse,\n    \"t value\": model1.tvalues,\n    \"p value\": model1.pvalues\n})\ntable4_col1.round(3)\n\n\n\n\n\n\n\n\nCoefficient\nStd. Error\nt value\np value\n\n\n\n\nconst\n-2.134\n1.042\n-2.048\n0.041\n\n\nnj\n2.446\n1.156\n2.116\n0.035\n\n\n\n\n\n\n\nThe coefficient on the New Jersey dummy is the reduced-form estimate reported in Table 4, column (i). The estimated coefficient (2.446) is very close to the value reported in the paper (2.33), confirming that the replication successfully reproduces the main result."
+  },
+  {
+    "objectID": "blog/second-post.html#something-additional-why-the-did-strategy-can-identify-a-causal-effect",
+    "href": "blog/second-post.html#something-additional-why-the-did-strategy-can-identify-a-causal-effect",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Something Additional: Why the DID Strategy Can Identify a Causal Effect",
+    "text": "Something Additional: Why the DID Strategy Can Identify a Causal Effect\nAs an additional step, I explain why the paper’s empirical strategy is intended to support a causal interpretation. The difference-in-differences approach compares the employment change in New Jersey to the employment change in Pennsylvania. This removes permanent differences between the two states and common time shocks that affect both states.\nThe key identifying assumption is that, absent the policy change, employment in New Jersey and Pennsylvania would have followed parallel trends. Under this assumption, the difference between the two states’ employment changes can be interpreted as the effect of the minimum wage increase."
+  },
+  {
+    "objectID": "blog/second-post.html#conclusion",
+    "href": "blog/second-post.html#conclusion",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Conclusion",
+    "text": "Conclusion\nI replicated selected descriptive statistics from Table 2, the core 9 numbers from Table 3, and column (i) of Table 4. Together, these results reproduce the paper’s main empirical finding: employment in New Jersey did not fall relative to Pennsylvania after the minimum wage increase."
   }
 ]

@@ -21,7 +21,7 @@
         "  echo: true\n",
         "---\n"
       ],
-      "id": "e97933d3"
+      "id": "3a1aae27"
     },
     {
       "cell_type": "code",
@@ -93,7 +93,7 @@
         "\n",
         "I then simulate 1,000 visitors in each group. Each simulated visitor either signs up (1) or does not (0), producing two Bernoulli samples that I use throughout the rest of the analysis."
       ],
-      "id": "2ee49c7f"
+      "id": "b2d4af77"
     },
     {
       "cell_type": "code",
@@ -137,7 +137,7 @@
         "\n",
         "To illustrate this, I compute the element-wise differences between the simulated A and B outcomes and then take the cumulative average. This shows how the estimate behaves as more and more observations are included."
       ],
-      "id": "7308f09e"
+      "id": "d059c4e3"
     },
     {
       "cell_type": "code",
@@ -192,7 +192,7 @@
         "\n",
         "The bootstrap provides a practical way to answer that question. Instead of relying entirely on a closed-form formula, I repeatedly resample from the observed data with replacement. For each bootstrap resample, I recompute the statistic of interest. The spread of those bootstrap estimates tells us how variable the estimator is, and the standard deviation of the bootstrap distribution gives an estimated standard error."
       ],
-      "id": "f9d86a6b"
+      "id": "0814c276"
     },
     {
       "cell_type": "code",
@@ -275,7 +275,7 @@
         "\n",
         "To illustrate the CLT, I repeatedly simulate the estimator $\\hat{\\theta}$ for four different sample sizes: $n \\in \\{25, 50, 100, 500\\}$. For each sample size, I generate 1,000 separate estimates and examine the resulting histograms."
       ],
-      "id": "2971dd3f"
+      "id": "75fd1554"
     },
     {
       "cell_type": "code",
@@ -371,7 +371,7 @@
         "\n",
         "This is often loosely described as a “t-test,” but in this Bernoulli setting the large-sample justification is more naturally a z-test. The distinction is not especially important here in practice, because with large samples the standard Normal and t distributions are extremely similar."
       ],
-      "id": "68c743eb"
+      "id": "9644cf8a"
     },
     {
       "cell_type": "code",
@@ -413,7 +413,7 @@
         "\n",
         "This regression has a very intuitive interpretation. When $D_i = 0$, the expected value of $Y_i$ is just the mean of group B, so $\\beta_0$ estimates $\\pi_B$. When $D_i = 1$, the expected value is $\\beta_0 + \\beta_1$, which estimates $\\pi_A$. That means $\\beta_1$ must equal the difference between the two group means, so it estimates $\\theta = \\pi_A - \\pi_B$."
       ],
-      "id": "b6a074e2"
+      "id": "d8537dc0"
     },
     {
       "cell_type": "code",
@@ -473,7 +473,7 @@
         "\n",
         "To demonstrate this, I simulate a world in which the null hypothesis is true. I set $\\pi_A = \\pi_B = 0.20$, so there is no real treatment effect. For each experiment, I simulate 1,000 observations per group, compute a p-value after every 100 observations, and record whether any of the 10 interim looks is significant. I then repeat the entire experiment 10,000 times."
       ],
-      "id": "401870a3"
+      "id": "3bdaf7c2"
     },
     {
       "cell_type": "code",
@@ -528,7 +528,7 @@
         "\n",
         "This is the practical danger of peeking. If analysts continuously monitor results and stop as soon as significance appears, they are no longer running a valid 5% hypothesis test. The reported p-value becomes misleading because the testing procedure itself has changed. In real A/B testing, this is why sequential testing methods or pre-registered stopping rules are so important."
       ],
-      "id": "903626ba"
+      "id": "26a3d8d4"
     }
   ],
   "metadata": {
