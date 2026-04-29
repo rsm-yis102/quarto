@@ -100,7 +100,8 @@ summary_table["Observed Sign-up Rate"] = summary_table["Observed Sign-up Rate"].
 summary_table
 ```
 
-In this simulated sample, the observed sign-up rate for CTA A is slightly higher than that for CTA B, which is consistent with the true data-generating process. Because the data are random, the estimated difference will not be exactly 0.04 in every simulation, but it should be reasonably close.
+In this simulated sample, the observed sign-up rate for CTA A is slightly higher than that for CTA B, which is consistent with the true data-generating process. Because the data are random, the estimated difference will not be exactly 0.04 in every simulation, but it should be reasonably close. From a practical perspective, this means CTA A would likely generate more newsletter sign-ups if the same message were shown to a large number of visitors.
+
 
 ## The Law of Large Numbers
 
