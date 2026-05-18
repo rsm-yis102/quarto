@@ -19,5 +19,8 @@
   },
   "blog/second-post.qmd": {
     "second-post.html": "b561d5b9"
+  },
+  "blog/Third-post.qmd": {
+    "Third-post.html": "c64ddd8b"
   }
 }

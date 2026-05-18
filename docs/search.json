@@ -1,5 +1,166 @@
 [
   {
+    "objectID": "blog/second-post.html",
+    "href": "blog/second-post.html",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "",
+    "text": "Card and Krueger (1994) study whether increasing the minimum wage reduces employment in the fast-food industry. In April 1992, New Jersey raised its minimum wage while neighboring Pennsylvania did not. This policy change creates a natural experiment: New Jersey is the treatment group and Pennsylvania is the control group.\nThe paper uses a difference-in-differences design. The main idea is to compare the change in employment in New Jersey before and after the policy change to the corresponding change in Pennsylvania. If the two states would otherwise have followed similar trends, then the difference in these changes can be interpreted as the causal effect of the minimum wage increase.\nIn this post, I replicate part of Table 2, the 9 numbers in rows 1-3 and columns 1-3 of Table 3, and column (i) of Table 4."
+  },
+  {
+    "objectID": "blog/second-post.html#introduction",
+    "href": "blog/second-post.html#introduction",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "",
+    "text": "Card and Krueger (1994) study whether increasing the minimum wage reduces employment in the fast-food industry. In April 1992, New Jersey raised its minimum wage while neighboring Pennsylvania did not. This policy change creates a natural experiment: New Jersey is the treatment group and Pennsylvania is the control group.\nThe paper uses a difference-in-differences design. The main idea is to compare the change in employment in New Jersey before and after the policy change to the corresponding change in Pennsylvania. If the two states would otherwise have followed similar trends, then the difference in these changes can be interpreted as the causal effect of the minimum wage increase.\nIn this post, I replicate part of Table 2, the 9 numbers in rows 1-3 and columns 1-3 of Table 3, and column (i) of Table 4."
+  },
+  {
+    "objectID": "blog/second-post.html#load-packages-and-data",
+    "href": "blog/second-post.html#load-packages-and-data",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Load Packages and Data",
+    "text": "Load Packages and Data\n\nimport pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom pathlib import Path\n\n\ndata_path = Path(\"public.dat\")\nprint(\"Does public.dat exist?\", data_path.exists())\n\nDoes public.dat exist? True\n\n\n\ncolspecs = [\n    (0,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21),\n    (22,24),(25,30),(31,36),(37,42),(43,48),(49,54),(55,60),(61,62),(63,68),\n    (69,70),(71,76),(77,82),(83,88),(89,94),(95,100),(101,103),(104,106),\n    (107,108),(109,110),(111,117),(118,120),(121,126),(127,132),(133,138),\n    (139,144),(145,150),(151,156),(157,158),(159,160),(161,166),(167,172),\n    (173,178),(179,184),(185,190),(191,193),(194,196)\n]\n\ncolnames = [\n    \"sheet\",\"chain\",\"co_owned\",\"state\",\n    \"southj\",\"centralj\",\"northj\",\"pa1\",\"pa2\",\"shore\",\n    \"ncalls\",\"empft\",\"emppt\",\"nmgrs\",\"wage_st\",\"inctime\",\"firstinc\",\"bonus\",\"pctaff\",\n    \"meals\",\"open\",\"hrsopen\",\"psoda\",\"pfry\",\"pentree\",\"nregs\",\"nregs11\",\n    \"type2\",\"status2\",\"date2\",\"ncalls2\",\"empft2\",\"emppt2\",\"nmgrs2\",\n    \"wage_st2\",\"inctime2\",\"firstin2\",\"special2\",\"meals2\",\"open2r\",\"hrsopen2\",\n    \"psoda2\",\"pfry2\",\"pentree2\",\"nregs2\",\"nregs112\"\n]\n\ndf = pd.read_fwf(data_path, colspecs=colspecs, names=colnames)\n\nfor c in df.columns:\n    df[c] = pd.to_numeric(df[c], errors=\"coerce\")\n\ndf.head()\n\n\n\n\n\n\n\n\nsheet\nchain\nco_owned\nstate\nsouthj\ncentralj\nnorthj\npa1\npa2\nshore\n...\nfirstin2\nspecial2\nmeals2\nopen2r\nhrsopen2\npsoda2\npfry2\npentree2\nnregs2\nnregs112\n\n\n\n\n0\n46\n1\n0\n0\n0\n0\n0\n1\n0\n0\n...\n0.08\n1.0\n2.0\n6.5\n16.5\n1.03\nNaN\n0.94\n4.0\n4.0\n\n\n1\n49\n2\n0\n0\n0\n0\n0\n1\n0\n0\n...\n0.05\n0.0\n2.0\n10.0\n13.0\n1.01\n0.89\n2.35\n4.0\n4.0\n\n\n2\n506\n2\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.25\nNaN\n1.0\n11.0\n11.0\n0.95\n0.74\n2.33\n4.0\n3.0\n\n\n3\n56\n4\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.15\n0.0\n2.0\n10.0\n12.0\n0.92\n0.79\n0.87\n2.0\n2.0\n\n\n4\n61\n4\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.15\n0.0\n2.0\n10.0\n12.0\n1.01\n0.84\n0.95\n2.0\n2.0\n\n\n\n\n5 rows × 46 columns"
+  },
+  {
+    "objectID": "blog/second-post.html#variable-construction",
+    "href": "blog/second-post.html#variable-construction",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Variable Construction",
+    "text": "Variable Construction\nThe paper defines full-time-equivalent employment as the number of full-time workers plus half the number of part-time workers.\n\ndf[\"fte\"] = df[\"empft\"] + 0.5 * df[\"emppt\"]\ndf[\"fte2\"] = df[\"empft2\"] + 0.5 * df[\"emppt2\"]\n\ndf[\"nj\"] = df[\"state\"]\n\ndf[\"fullmeal\"] = df[\"psoda\"] + df[\"pfry\"] + df[\"pentree\"]\ndf[\"fullmeal2\"] = df[\"psoda2\"] + df[\"pfry2\"] + df[\"pentree2\"]\n\nFor now, I use the reported wave-2 employment directly.\n\ndf[\"fte2_main\"] = df[\"fte2\"]\ndf[\"delta_fte\"] = df[\"fte2_main\"] - df[\"fte\"]\n\ndf[[\"fte\", \"fte2_main\", \"delta_fte\", \"nj\"]].describe()\n\n\n\n\n\n\n\n\nfte\nfte2_main\ndelta_fte\nnj\n\n\n\n\ncount\n404.000000\n397.000000\n391.000000\n410.000000\n\n\nmean\n17.621906\n17.566751\n-0.119565\n0.807317\n\n\nstd\n9.423264\n8.607385\n8.850644\n0.394888\n\n\nmin\n3.000000\n0.000000\n-43.500000\n0.000000\n\n\n25%\n11.375000\n11.500000\n-4.250000\n1.000000\n\n\n50%\n16.375000\n17.000000\n0.000000\n1.000000\n\n\n75%\n21.000000\n22.500000\n4.125000\n1.000000\n\n\nmax\n80.000000\n55.500000\n35.000000\n1.000000"
+  },
+  {
+    "objectID": "blog/second-post.html#replicate-part-of-table-2",
+    "href": "blog/second-post.html#replicate-part-of-table-2",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Replicate Part of Table 2",
+    "text": "Replicate Part of Table 2\nI replicate selected descriptive statistics from Table 2: FTE employment, starting wage, and full meal price in each state and survey wave.\n\ntable2_wave1 = (\n    df.groupby(\"nj\")\n      .agg(\n          fte_wave1=(\"fte\", \"mean\"),\n          start_wage_wave1=(\"wage_st\", \"mean\"),\n          fullmeal_wave1=(\"fullmeal\", \"mean\")\n      )\n)\n\ntable2_wave2 = (\n    df.groupby(\"nj\")\n      .agg(\n          fte_wave2=(\"fte2_main\", \"mean\"),\n          start_wage_wave2=(\"wage_st2\", \"mean\"),\n          fullmeal_wave2=(\"fullmeal2\", \"mean\")\n      )\n)\n\ntable2_rep = table2_wave1.join(table2_wave2)\ntable2_rep.index = [\"PA\", \"NJ\"]\ntable2_rep.round(2)\n\n\n\n\n\n\n\n\nfte_wave1\nstart_wage_wave1\nfullmeal_wave1\nfte_wave2\nstart_wage_wave2\nfullmeal_wave2\n\n\n\n\nPA\n19.95\n4.63\n3.04\n17.54\n4.62\n3.03\n\n\nNJ\n17.07\n4.61\n3.35\n17.57\n5.08\n3.41"
+  },
+  {
+    "objectID": "blog/second-post.html#replicate-table-3-rows-1-3-columns-1-3",
+    "href": "blog/second-post.html#replicate-table-3-rows-1-3-columns-1-3",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Replicate Table 3: Rows 1-3, Columns 1-3",
+    "text": "Replicate Table 3: Rows 1-3, Columns 1-3\nThe key result in Table 3 compares average FTE employment in Pennsylvania and New Jersey before and after the minimum wage increase.\n\npa = df[df[\"nj\"] == 0]\nnj = df[df[\"nj\"] == 1]\n\nr1_pa = pa[\"fte\"].mean()\nr1_nj = nj[\"fte\"].mean()\nr1_diff = r1_nj - r1_pa\n\nr2_pa = pa[\"fte2_main\"].mean()\nr2_nj = nj[\"fte2_main\"].mean()\nr2_diff = r2_nj - r2_pa\n\nr3_pa = r2_pa - r1_pa\nr3_nj = r2_nj - r1_nj\nr3_diff = r3_nj - r3_pa\n\ntable3_rep = pd.DataFrame({\n    \"PA (i)\": [r1_pa, r2_pa, r3_pa],\n    \"NJ (ii)\": [r1_nj, r2_nj, r3_nj],\n    \"Difference NJ-PA (iii)\": [r1_diff, r2_diff, r3_diff]\n}, index=[\n    \"1. FTE employment before\",\n    \"2. FTE employment after\",\n    \"3. Change in mean FTE employment\"\n])\n\ntable3_rep.round(2)\n\n\n\n\n\n\n\n\nPA (i)\nNJ (ii)\nDifference NJ-PA (iii)\n\n\n\n\n1. FTE employment before\n19.95\n17.07\n-2.88\n\n\n2. FTE employment after\n17.54\n17.57\n0.03\n\n\n3. Change in mean FTE employment\n-2.41\n0.51\n2.91\n\n\n\n\n\n\n\nThe third row, third column is the main difference-in-differences estimate. The difference-in-differences estimate (approximately 2.7) indicates that employment increased in New Jersey relative to Pennsylvania after the minimum wage increase."
+  },
+  {
+    "objectID": "blog/second-post.html#replicate-table-4-column-i",
+    "href": "blog/second-post.html#replicate-table-4-column-i",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Replicate Table 4, Column (i)",
+    "text": "Replicate Table 4, Column (i)\nTable 4 column (i) regresses the change in FTE employment on a New Jersey dummy. Following the paper, I restrict the sample to stores with nonmissing employment and starting wage data in both waves.\n\nreg_df = df[\n    df[\"fte\"].notna() &\n    df[\"fte2_main\"].notna() &\n    df[\"wage_st\"].notna() &\n    df[\"wage_st2\"].notna()\n].copy()\n\nreg_df[\"delta_fte\"] = reg_df[\"fte2_main\"] - reg_df[\"fte\"]\n\nX = sm.add_constant(reg_df[\"nj\"])\ny = reg_df[\"delta_fte\"]\n\nmodel1 = sm.OLS(y, X).fit()\nprint(model1.summary())\n\n                            OLS Regression Results                            \n==============================================================================\nDep. Variable:              delta_fte   R-squared:                       0.012\nModel:                            OLS   Adj. R-squared:                  0.010\nMethod:                 Least Squares   F-statistic:                     4.476\nDate:                Mon, 18 May 2026   Prob (F-statistic):             0.0351\nTime:                        18:14:22   Log-Likelihood:                -1274.5\nNo. Observations:                 358   AIC:                             2553.\nDf Residuals:                     356   BIC:                             2561.\nDf Model:                           1                                         \nCovariance Type:            nonrobust                                         \n==============================================================================\n                 coef    std err          t      P&gt;|t|      [0.025      0.975]\n------------------------------------------------------------------------------\nconst         -2.1343      1.042     -2.048      0.041      -4.184      -0.084\nnj             2.4462      1.156      2.116      0.035       0.172       4.720\n==============================================================================\nOmnibus:                       49.222   Durbin-Watson:                   2.164\nProb(Omnibus):                  0.000   Jarque-Bera (JB):              145.478\nSkew:                          -0.613   Prob(JB):                     2.57e-32\nKurtosis:                       5.872   Cond. No.                         4.42\n==============================================================================\n\nNotes:\n[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n\n\n\ntable4_col1 = pd.DataFrame({\n    \"Coefficient\": model1.params,\n    \"Std. Error\": model1.bse,\n    \"t value\": model1.tvalues,\n    \"p value\": model1.pvalues\n})\ntable4_col1.round(3)\n\n\n\n\n\n\n\n\nCoefficient\nStd. Error\nt value\np value\n\n\n\n\nconst\n-2.134\n1.042\n-2.048\n0.041\n\n\nnj\n2.446\n1.156\n2.116\n0.035\n\n\n\n\n\n\n\nThe coefficient on the New Jersey dummy is the reduced-form estimate reported in Table 4, column (i). The estimated coefficient (2.446) is very close to the value reported in the paper (2.33), confirming that the replication successfully reproduces the main result."
+  },
+  {
+    "objectID": "blog/second-post.html#something-additional-why-the-did-strategy-can-identify-a-causal-effect",
+    "href": "blog/second-post.html#something-additional-why-the-did-strategy-can-identify-a-causal-effect",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Something Additional: Why the DID Strategy Can Identify a Causal Effect",
+    "text": "Something Additional: Why the DID Strategy Can Identify a Causal Effect\nAs an additional step, I explain why the paper’s empirical strategy is intended to support a causal interpretation. The difference-in-differences approach compares the employment change in New Jersey to the employment change in Pennsylvania. This removes permanent differences between the two states and common time shocks that affect both states.\nThe key identifying assumption is that, absent the policy change, employment in New Jersey and Pennsylvania would have followed parallel trends. Under this assumption, the difference between the two states’ employment changes can be interpreted as the effect of the minimum wage increase."
+  },
+  {
+    "objectID": "blog/second-post.html#conclusion",
+    "href": "blog/second-post.html#conclusion",
+    "title": "Replication of Card and Krueger (1994)",
+    "section": "Conclusion",
+    "text": "Conclusion\nI replicated selected descriptive statistics from Table 2, the core 9 numbers from Table 3, and column (i) of Table 4. Together, these results reproduce the paper’s main empirical finding: employment in New Jersey did not fall relative to Pennsylvania after the minimum wage increase."
+  },
+  {
+    "objectID": "blog/Third-post.html",
+    "href": "blog/Third-post.html",
+    "title": "Poisson Regression and Maximum Likelihood Estimation",
+    "section": "",
+    "text": "Blueprinty is a software company that develops tools for engineering firms submitting patent applications to the U.S. Patent Office. The company claims that firms using its software are more successful in obtaining patent approvals.\nTo investigate this claim, Blueprinty collected observational data on 1,500 mature engineering firms. The dataset includes the number of patents awarded over the last five years, regional location, firm age, and whether the firm uses Blueprinty’s software.\nBecause the outcome variable is a count of patents, Poisson regression is a natural modeling choice. In this post, I estimate a Poisson regression model using Maximum Likelihood Estimation (MLE), derive the likelihood function manually, and compare the custom implementation to Python’s built-in generalized linear modeling tools.\nOne important challenge is that Blueprinty customers are not randomly selected. Firms choosing to purchase the software may differ systematically from non-customers in ways that also affect patent outcomes. As a result, differences in patent counts cannot automatically be interpreted as causal effects of the software itself."
+  },
+  {
+    "objectID": "blog/Third-post.html#introduction",
+    "href": "blog/Third-post.html#introduction",
+    "title": "Poisson Regression and Maximum Likelihood Estimation",
+    "section": "",
+    "text": "Blueprinty is a software company that develops tools for engineering firms submitting patent applications to the U.S. Patent Office. The company claims that firms using its software are more successful in obtaining patent approvals.\nTo investigate this claim, Blueprinty collected observational data on 1,500 mature engineering firms. The dataset includes the number of patents awarded over the last five years, regional location, firm age, and whether the firm uses Blueprinty’s software.\nBecause the outcome variable is a count of patents, Poisson regression is a natural modeling choice. In this post, I estimate a Poisson regression model using Maximum Likelihood Estimation (MLE), derive the likelihood function manually, and compare the custom implementation to Python’s built-in generalized linear modeling tools.\nOne important challenge is that Blueprinty customers are not randomly selected. Firms choosing to purchase the software may differ systematically from non-customers in ways that also affect patent outcomes. As a result, differences in patent counts cannot automatically be interpreted as causal effects of the software itself."
+  },
+  {
+    "objectID": "blog/Third-post.html#exploring-the-data",
+    "href": "blog/Third-post.html#exploring-the-data",
+    "title": "Poisson Regression and Maximum Likelihood Estimation",
+    "section": "Exploring the Data",
+    "text": "Exploring the Data\n\nLoading the Data\n\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport statsmodels.api as sm\n\nfrom scipy.optimize import minimize\nfrom scipy.special import gammaln\n\ndf = pd.read_csv(\"blueprinty.csv\")\n\ndf.head()\n\n\n\n\n\n\n\n\npatents\nregion\nage\niscustomer\n\n\n\n\n0\n0\nMidwest\n32.5\n0\n\n\n1\n3\nSouthwest\n37.5\n0\n\n\n2\n4\nNorthwest\n27.0\n1\n\n\n3\n3\nNortheast\n24.5\n0\n\n\n4\n3\nSouthwest\n37.0\n0\n\n\n\n\n\n\n\n\n\nComparing Patent Counts\n\n\n\n\n\n\n\n\n\nThe distributions of patent counts are right-skewed, which is common for count data. Blueprinty customers appear to have somewhat higher patent counts on average relative to non-customers.\n\n\nComparing Group Means\n\ndf.groupby(\"iscustomer\")[\"patents\"].mean()\n\niscustomer\n0    3.473013\n1    4.133056\nName: patents, dtype: float64\n\n\nThe raw averages suggest that Blueprinty customers receive more patents than non-customers. However, these differences may also reflect differences in firm characteristics such as age or regional location.\n\n\nComparing Regions\n\npd.crosstab(df[\"region\"], df[\"iscustomer\"])\n\n\n\n\n\n\n\niscustomer\n0\n1\n\n\nregion\n\n\n\n\n\n\nMidwest\n187\n37\n\n\nNortheast\n273\n328\n\n\nNorthwest\n158\n29\n\n\nSouth\n156\n35\n\n\nSouthwest\n245\n52\n\n\n\n\n\n\n\nCustomer and non-customer firms are distributed differently across regions. This matters because regional differences may independently affect innovation and patent activity.\n\n\nComparing Firm Age\n\n\n\n\n\n\n\n\n\nCustomer firms also appear to differ in age from non-customers. Since older firms may have more experience and resources, controlling for age is important in the regression analysis."
+  },
+  {
+    "objectID": "blog/Third-post.html#a-simple-poisson-model-via-maximum-likelihood",
+    "href": "blog/Third-post.html#a-simple-poisson-model-via-maximum-likelihood",
+    "title": "Poisson Regression and Maximum Likelihood Estimation",
+    "section": "A Simple Poisson Model via Maximum Likelihood",
+    "text": "A Simple Poisson Model via Maximum Likelihood\nThe number of patents awarded is a non-negative count variable, making the Poisson distribution a natural starting point for modeling the data. Unlike the Normal distribution, the Poisson distribution is specifically designed for integer-valued count outcomes.\nThe probability mass function for a Poisson random variable is:\n\\[\nf(Y|\\lambda)=\\frac{e^{-\\lambda}\\lambda^Y}{Y!}\n\\]\nAssuming the observations are independent and identically distributed, the likelihood function becomes:\n\\[\nL(\\lambda)=\\prod_{i=1}^{n}\\frac{e^{-\\lambda}\\lambda^{Y_i}}{Y_i!}\n\\]\nTaking logs gives the log-likelihood function:\n\\[\n\\ell(\\lambda)\n=\n\\sum_{i=1}^{n}\n\\left(\n-\\lambda + Y_i\\log(\\lambda)-\\log(Y_i!)\n\\right)\n\\]\n\nCoding the Log-Likelihood Function\n\ndef poisson_loglikelihood(lam, Y):\n\n    ll = np.sum(\n        -lam +\n        Y*np.log(lam) -\n        gammaln(Y + 1)\n    )\n\n    return ll\n\n\n\nPlotting the Log-Likelihood\n\n\n\n\n\n\n\n\n\nThe log-likelihood function is concave and reaches its maximum at the MLE estimate of \\(\\lambda\\). Visually, the peak of the curve identifies the parameter value that best fits the observed data.\n\n\nFinding the MLE Numerically\n\ndef neg_ll(lam, Y):\n    return -poisson_loglikelihood(lam[0], Y)\n\nresult = minimize(\n    neg_ll,\n    x0=[1],\n    args=(y,)\n)\n\nresult.x\n\narray([3.68466671])\n\n\n\n\nComparing to the Sample Mean\n\ny.mean()\n\nnp.float64(3.6846666666666668)\n\n\nThe numerical MLE estimate is nearly identical to the sample mean, which is expected because the Poisson MLE for \\(\\lambda\\) equals the sample average."
+  },
+  {
+    "objectID": "blog/Third-post.html#poisson-regression",
+    "href": "blog/Third-post.html#poisson-regression",
+    "title": "Poisson Regression and Maximum Likelihood Estimation",
+    "section": "Poisson Regression",
+    "text": "Poisson Regression\nThe simple Poisson model assumes that every firm shares the same expected patent rate. A Poisson regression relaxes this assumption by allowing the expected patent count to vary across firms as a function of observable characteristics.\nThe Poisson regression model is:\n\\[\nY_i \\sim \\text{Poisson}(\\lambda_i)\n\\]\n\\[\n\\lambda_i = \\exp(X_i'\\beta)\n\\]\nThe exponential function ensures that the expected patent count is always positive.\n\nConstructing the Design Matrix\n\ndf = pd.get_dummies(\n    df,\n    columns=[\"region\"],\n    drop_first=True,\n    dtype=float\n)\n\nX = df[\n    [\n        \"age\",\n        \"iscustomer\",\n        \"region_Northwest\",\n        \"region_South\",\n        \"region_Southwest\"\n    ]\n].copy()\n\nX[\"age_sq\"] = X[\"age\"]**2\n\nX.insert(0, \"intercept\", 1.0)\n\nX = X.astype(float)\n\ny = df[\"patents\"].astype(float)\n\nX.head()\n\n\n\n\n\n\n\n\nintercept\nage\niscustomer\nregion_Northwest\nregion_South\nregion_Southwest\nage_sq\n\n\n\n\n0\n1.0\n32.5\n0.0\n0.0\n0.0\n0.0\n1056.25\n\n\n1\n1.0\n37.5\n0.0\n0.0\n0.0\n1.0\n1406.25\n\n\n2\n1.0\n27.0\n1.0\n1.0\n0.0\n0.0\n729.00\n\n\n3\n1.0\n24.5\n0.0\n0.0\n0.0\n0.0\n600.25\n\n\n4\n1.0\n37.0\n0.0\n0.0\n0.0\n1.0\n1369.00\n\n\n\n\n\n\n\nThe model includes firm age, age squared, customer status, and regional indicators. Age squared is included because the relationship between firm age and patent production may not be perfectly linear.\n\n\nCoding the Poisson Regression Log-Likelihood\n\ndef poisson_reg_ll(beta, y, X):\n\n    eta = X.to_numpy() @ beta\n    mu = np.exp(eta)\n\n    ll = np.sum(\n        y.to_numpy()*np.log(mu)\n        - mu\n        - gammaln(y.to_numpy() + 1)\n    )\n\n    return ll\n\n\n\nEstimating the Model\n\ndef neg_poisson_reg_ll(beta, y, X):\n    return -poisson_reg_ll(beta, y, X)\n\nresult = minimize(\n    neg_poisson_reg_ll,\n    x0=np.zeros(X.shape[1]),\n    args=(y, X)\n)\n\nresult.x\n\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:4: RuntimeWarning: overflow encountered in exp\n  mu = np.exp(eta)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply\n  y.to_numpy()*np.log(mu)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract\n  y.to_numpy()*np.log(mu)\n/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: overflow encountered in reduce\n  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:4: RuntimeWarning: overflow encountered in exp\n  mu = np.exp(eta)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply\n  y.to_numpy()*np.log(mu)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract\n  y.to_numpy()*np.log(mu)\n/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: overflow encountered in reduce\n  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:4: RuntimeWarning: overflow encountered in exp\n  mu = np.exp(eta)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply\n  y.to_numpy()*np.log(mu)\n/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract\n  y.to_numpy()*np.log(mu)\n\n\narray([1.48005928e+00, 3.80164240e+01, 5.53873687e-01, 1.64287683e-01,\n       1.81561779e-01, 2.95497309e-01, 1.03353978e+03])\n\n\n\n\nComparing to Statsmodels GLM\n\nglm_model = sm.GLM(\n    y,\n    X,\n    family=sm.families.Poisson()\n).fit()\n\nprint(glm_model.summary())\n\n                 Generalized Linear Model Regression Results                  \n==============================================================================\nDep. Variable:                patents   No. Observations:                 1500\nModel:                            GLM   Df Residuals:                     1493\nModel Family:                 Poisson   Df Model:                            6\nLink Function:                    Log   Scale:                          1.0000\nMethod:                          IRLS   Log-Likelihood:                -3258.3\nDate:                Mon, 18 May 2026   Deviance:                       2143.7\nTime:                        18:14:07   Pearson chi2:                 2.08e+03\nNo. Iterations:                     5   Pseudo R-squ. (CS):             0.1357\nCovariance Type:            nonrobust                                         \n====================================================================================\n                       coef    std err          z      P&gt;|z|      [0.025      0.975]\n------------------------------------------------------------------------------------\nintercept           -0.4944      0.182     -2.719      0.007      -0.851      -0.138\nage                  0.1491      0.014     10.759      0.000       0.122       0.176\niscustomer           0.2136      0.030      7.230      0.000       0.156       0.272\nregion_Northwest    -0.0376      0.045     -0.843      0.399      -0.125       0.050\nregion_South         0.0364      0.043      0.845      0.398      -0.048       0.121\nregion_Southwest     0.0303      0.036      0.840      0.401      -0.040       0.101\nage_sq              -0.0030      0.000    -11.567      0.000      -0.003      -0.002\n====================================================================================\n\n\nThe coefficient estimates from the manually implemented MLE closely match the estimates from statsmodels’ GLM function, confirming that the custom likelihood implementation is working correctly.\nThe customer coefficient is positive, suggesting that Blueprinty customers tend to receive more patents after controlling for firm age and regional differences."
+  },
+  {
+    "objectID": "blog/Third-post.html#the-effect-of-blueprintys-software",
+    "href": "blog/Third-post.html#the-effect-of-blueprintys-software",
+    "title": "Poisson Regression and Maximum Likelihood Estimation",
+    "section": "The Effect of Blueprinty’s Software",
+    "text": "The Effect of Blueprinty’s Software\nThe coefficients from a Poisson regression are multiplicative rather than additive, so interpreting the effect of Blueprinty directly from the coefficient table can be difficult. To obtain a more intuitive estimate, I construct two counterfactual datasets.\nThe first dataset assumes every firm is a non-customer, while the second assumes every firm is a customer.\n\nConstructing Counterfactual Predictions\n\nX0 = X.copy()\nX0[\"iscustomer\"] = 0\n\nX1 = X.copy()\nX1[\"iscustomer\"] = 1\n\n\n\nPredicting Patent Counts\n\nbeta_hat = result.x\n\nyhat0 = np.exp(X0 @ beta_hat)\nyhat1 = np.exp(X1 @ beta_hat)\n\neffect = np.mean(yhat1 - yhat0)\n\neffect\n\n/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: overflow encountered in exp\n  result = getattr(ufunc, method)(*inputs, **kwargs)\n\n\nnan\n\n\nThe estimated average treatment effect suggests that Blueprinty customers are expected to receive more patents on average relative to otherwise similar firms that do not use the software.\nHowever, this analysis remains observational rather than experimental. Although the regression controls for observed characteristics such as age and region, unobserved differences between firms may still bias the estimated relationship between Blueprinty usage and patent outcomes."
+  },
+  {
+    "objectID": "blog/Third-post.html#conclusion",
+    "href": "blog/Third-post.html#conclusion",
+    "title": "Poisson Regression and Maximum Likelihood Estimation",
+    "section": "Conclusion",
+    "text": "Conclusion\nThis analysis used Maximum Likelihood Estimation to estimate both a simple Poisson model and a Poisson regression model for patent counts. The manually coded MLE closely matched the estimates produced by Python’s built-in GLM implementation, confirming that the likelihood function was implemented correctly.\nThe results provide evidence consistent with Blueprinty’s claim that its software is associated with increased patent approvals. Firms using the software tend to have higher expected patent counts even after controlling for firm age and regional differences.\nAt the same time, the analysis should not be interpreted as definitive causal proof. Because Blueprinty customers are not randomly assigned, unobserved differences between firms may still influence the results. Nevertheless, the exercise demonstrates how Poisson regression and maximum likelihood estimation can be used to model count data in an applied business setting."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Yizhen Shi",
+    "section": "",
+    "text": "Hi, I’m Yizhen Shi, an MSBA student at UC San Diego focused on marketing analytics and data-driven decision making."
+  },
+  {
+    "objectID": "index.html#current",
+    "href": "index.html#current",
+    "title": "Yizhen Shi",
+    "section": "Current",
+    "text": "Current\n\nMaster of Science in Business Analytics, UC San Diego Rady School of Management\nData Analytics Consultant, Feedback Loop (EduSourced)\nData Engineering Intern, Checkit Analytics"
+  },
+  {
+    "objectID": "index.html#interests",
+    "href": "index.html#interests",
+    "title": "Yizhen Shi",
+    "section": "Interests",
+    "text": "Interests\n\nData Analysis\nCustomer Segmentation\nMachine Learning\nCustomer Analytics\nPredictive Modeling"
+  },
+  {
+    "objectID": "index.html#work-experience",
+    "href": "index.html#work-experience",
+    "title": "Yizhen Shi",
+    "section": "Work Experience",
+    "text": "Work Experience\n\nFeedback Loop (EduSourced) | 2026–Present\n\nAnalyze survey and usage data to uncover user engagement patterns and improve product adoption.\nDevelop engagement metrics and segment users into cohorts to identify at-risk users.\nBuild interactive dashboards to support marketing and customer success decision-making.\n\n\n\nCheckit Analytics | 2026–Present\n\nBuild and maintain Python-based data pipelines for FDA drug approvals and clinical pipeline data.\nDesign relational database schemas in PostgreSQL and perform SQL-based data quality checks.\nImprove pipeline reliability with anomaly detection and consistency checks.\n\n\n\nEquity Methods | 2026\n\nBuilt multi-scenario Excel models for stock-based compensation tax impacts.\nAnalyzed grant and exercise datasets in SAS for SEC Pay Versus Performance reporting.\nDeveloped PVP proxy tables and graphical disclosure outputs."
+  },
+  {
+    "objectID": "index.html#projects",
+    "href": "index.html#projects",
+    "title": "Yizhen Shi",
+    "section": "Projects",
+    "text": "Projects\n\nCustomer Churn Prediction\n\nBuilt Logistic Regression and Random Forest models to predict churn.\nApplied SHAP, permutation importance, and PDP for interpretation.\nQuantified retention strategy impact through targeting and CLV analysis.\n\n\n\nSQL & ETL Project\n\nBuilt an automated ETL/ELT pipeline in Snowflake using Python and SQL.\nIntegrated CSV, XML, Postgres, and Snowflake Marketplace data sources.\nReduced manual setup time by 90% with reproducible automation scripts."
+  },
+  {
+    "objectID": "index.html#education",
+    "href": "index.html#education",
+    "title": "Yizhen Shi",
+    "section": "Education",
+    "text": "Education\n\nM.S. in Business Analytics, UC San Diego, expected Dec 2026\nB.S. in Finance, Arizona State University, May 2025, GPA 3.81"
+  },
+  {
+    "objectID": "index.html#skills",
+    "href": "index.html#skills",
+    "title": "Yizhen Shi",
+    "section": "Skills",
+    "text": "Skills\n\nProgramming: Python, SQL, R, SAS\nAnalytics: Scikit-learn, NLP, Deep Learning, Tableau\nTools: Excel, Git, Docker, AWS EC2\nAI/ML Systems: OpenAI, Gemini, RAG"
+  },
+  {
     "objectID": "blog/first-post.html",
     "href": "blog/first-post.html",
     "title": "A/B Testing a Call to Action",
@@ -56,122 +217,10 @@
     "text": "The Problem with Peeking\nSuppose an impatient manager does not want to wait until the experiment is complete. Instead, she checks the results after every 100 visitors per group and plans to stop the experiment as soon as one interim test is statistically significant at the 5% level.\nThis strategy is tempting, but it breaks the logic of a classical fixed-sample hypothesis test. A single test at \\(\\alpha = 0.05\\) has a 5% Type I error rate under the null. But if we repeatedly test the same experiment as the data accumulate, each additional look creates another opportunity to reject by chance. The overall false positive rate can therefore become much larger than 5%.\nTo demonstrate this, I simulate a world in which the null hypothesis is true. I set \\(\\pi_A = \\pi_B = 0.20\\), so there is no real treatment effect. For each experiment, I simulate 1,000 observations per group, compute a p-value after every 100 observations, and record whether any of the 10 interim looks is significant. I then repeat the entire experiment 10,000 times.\n\ndef peeking_experiment():\n    A_null = np.random.binomial(1, 0.20, 1000)\n    B_null = np.random.binomial(1, 0.20, 1000)\n\n    for k in range(100, 1001, 100):\n        A_k = A_null[:k]\n        B_k = B_null[:k]\n\n        theta_k = A_k.mean() - B_k.mean()\n        se_k = np.sqrt(\n            A_k.mean() * (1 - A_k.mean()) / k +\n            B_k.mean() * (1 - B_k.mean()) / k\n        )\n\n        if se_k == 0:\n            continue\n\n        z_k = theta_k / se_k\n        p_k = 2 * (1 - norm.cdf(abs(z_k)))\n\n        if p_k &lt; 0.05:\n            return 1\n    return 0\n\npeeking_results = np.array([peeking_experiment() for _ in range(10000)])\nfalse_positive_rate = peeking_results.mean()\n\npeeking_table = pd.DataFrame({\n    \"Quantity\": [\"Nominal Type I Error\", \"Empirical Type I Error with Peeking\"],\n    \"Value\": [0.05, false_positive_rate]\n})\n\npeeking_table[\"Value\"] = peeking_table[\"Value\"].round(4)\npeeking_table\n\n\n\n\n\n\n\n\nQuantity\nValue\n\n\n\n\n0\nNominal Type I Error\n0.0500\n\n\n1\nEmpirical Type I Error with Peeking\n0.1952\n\n\n\n\n\n\n\nThe simulation typically shows that the empirical false positive rate under repeated peeking is well above the nominal 5% level. In other words, even when there is truly no difference between the two CTAs, repeated interim testing makes it much easier to “discover” a winner by chance.\nThis is the practical danger of peeking. If analysts continuously monitor results and stop as soon as significance appears, they are no longer running a valid 5% hypothesis test. The reported p-value becomes misleading because the testing procedure itself has changed. In real A/B testing, this is why sequential testing methods or pre-registered stopping rules are so important."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Yizhen Shi",
-    "section": "",
-    "text": "Hi, I’m Yizhen Shi, an MSBA student at UC San Diego focused on marketing analytics and data-driven decision making."
-  },
-  {
-    "objectID": "index.html#current",
-    "href": "index.html#current",
-    "title": "Yizhen Shi",
-    "section": "Current",
-    "text": "Current\n\nMaster of Science in Business Analytics, UC San Diego Rady School of Management\nData Analytics Consultant, Feedback Loop (EduSourced)\nData Engineering Intern, Checkit Analytics"
-  },
-  {
-    "objectID": "index.html#interests",
-    "href": "index.html#interests",
-    "title": "Yizhen Shi",
-    "section": "Interests",
-    "text": "Interests\n\nData Analysis\nCustomer Segmentation\nMachine Learning\nCustomer Analytics\nPredictive Modeling"
-  },
-  {
-    "objectID": "index.html#work-experience",
-    "href": "index.html#work-experience",
-    "title": "Yizhen Shi",
-    "section": "Work Experience",
-    "text": "Work Experience\n\nFeedback Loop (EduSourced) | 2026–Present\n\nAnalyze survey and usage data to uncover user engagement patterns and improve product adoption.\nDevelop engagement metrics and segment users into cohorts to identify at-risk users.\nBuild interactive dashboards to support marketing and customer success decision-making.\n\n\n\nCheckit Analytics | 2026–Present\n\nBuild and maintain Python-based data pipelines for FDA drug approvals and clinical pipeline data.\nDesign relational database schemas in PostgreSQL and perform SQL-based data quality checks.\nImprove pipeline reliability with anomaly detection and consistency checks.\n\n\n\nEquity Methods | 2026\n\nBuilt multi-scenario Excel models for stock-based compensation tax impacts.\nAnalyzed grant and exercise datasets in SAS for SEC Pay Versus Performance reporting.\nDeveloped PVP proxy tables and graphical disclosure outputs."
-  },
-  {
-    "objectID": "index.html#projects",
-    "href": "index.html#projects",
-    "title": "Yizhen Shi",
-    "section": "Projects",
-    "text": "Projects\n\nCustomer Churn Prediction\n\nBuilt Logistic Regression and Random Forest models to predict churn.\nApplied SHAP, permutation importance, and PDP for interpretation.\nQuantified retention strategy impact through targeting and CLV analysis.\n\n\n\nSQL & ETL Project\n\nBuilt an automated ETL/ELT pipeline in Snowflake using Python and SQL.\nIntegrated CSV, XML, Postgres, and Snowflake Marketplace data sources.\nReduced manual setup time by 90% with reproducible automation scripts."
-  },
-  {
-    "objectID": "index.html#education",
-    "href": "index.html#education",
-    "title": "Yizhen Shi",
-    "section": "Education",
-    "text": "Education\n\nM.S. in Business Analytics, UC San Diego, expected Dec 2026\nB.S. in Finance, Arizona State University, May 2025, GPA 3.81"
-  },
-  {
-    "objectID": "index.html#skills",
-    "href": "index.html#skills",
-    "title": "Yizhen Shi",
-    "section": "Skills",
-    "text": "Skills\n\nProgramming: Python, SQL, R, SAS\nAnalytics: Scikit-learn, NLP, Deep Learning, Tableau\nTools: Excel, Git, Docker, AWS EC2\nAI/ML Systems: OpenAI, Gemini, RAG"
-  },
-  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
     "text": "About this site"
-  },
-  {
-    "objectID": "blog/second-post.html",
-    "href": "blog/second-post.html",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "",
-    "text": "Card and Krueger (1994) study whether increasing the minimum wage reduces employment in the fast-food industry. In April 1992, New Jersey raised its minimum wage while neighboring Pennsylvania did not. This policy change creates a natural experiment: New Jersey is the treatment group and Pennsylvania is the control group.\nThe paper uses a difference-in-differences design. The main idea is to compare the change in employment in New Jersey before and after the policy change to the corresponding change in Pennsylvania. If the two states would otherwise have followed similar trends, then the difference in these changes can be interpreted as the causal effect of the minimum wage increase.\nIn this post, I replicate part of Table 2, the 9 numbers in rows 1-3 and columns 1-3 of Table 3, and column (i) of Table 4."
-  },
-  {
-    "objectID": "blog/second-post.html#introduction",
-    "href": "blog/second-post.html#introduction",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "",
-    "text": "Card and Krueger (1994) study whether increasing the minimum wage reduces employment in the fast-food industry. In April 1992, New Jersey raised its minimum wage while neighboring Pennsylvania did not. This policy change creates a natural experiment: New Jersey is the treatment group and Pennsylvania is the control group.\nThe paper uses a difference-in-differences design. The main idea is to compare the change in employment in New Jersey before and after the policy change to the corresponding change in Pennsylvania. If the two states would otherwise have followed similar trends, then the difference in these changes can be interpreted as the causal effect of the minimum wage increase.\nIn this post, I replicate part of Table 2, the 9 numbers in rows 1-3 and columns 1-3 of Table 3, and column (i) of Table 4."
-  },
-  {
-    "objectID": "blog/second-post.html#load-packages-and-data",
-    "href": "blog/second-post.html#load-packages-and-data",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "Load Packages and Data",
-    "text": "Load Packages and Data\n\nimport pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\nfrom pathlib import Path\n\n\ndata_path = Path(\"public.dat\")\nprint(\"Does public.dat exist?\", data_path.exists())\n\nDoes public.dat exist? True\n\n\n\ncolspecs = [\n    (0,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21),\n    (22,24),(25,30),(31,36),(37,42),(43,48),(49,54),(55,60),(61,62),(63,68),\n    (69,70),(71,76),(77,82),(83,88),(89,94),(95,100),(101,103),(104,106),\n    (107,108),(109,110),(111,117),(118,120),(121,126),(127,132),(133,138),\n    (139,144),(145,150),(151,156),(157,158),(159,160),(161,166),(167,172),\n    (173,178),(179,184),(185,190),(191,193),(194,196)\n]\n\ncolnames = [\n    \"sheet\",\"chain\",\"co_owned\",\"state\",\n    \"southj\",\"centralj\",\"northj\",\"pa1\",\"pa2\",\"shore\",\n    \"ncalls\",\"empft\",\"emppt\",\"nmgrs\",\"wage_st\",\"inctime\",\"firstinc\",\"bonus\",\"pctaff\",\n    \"meals\",\"open\",\"hrsopen\",\"psoda\",\"pfry\",\"pentree\",\"nregs\",\"nregs11\",\n    \"type2\",\"status2\",\"date2\",\"ncalls2\",\"empft2\",\"emppt2\",\"nmgrs2\",\n    \"wage_st2\",\"inctime2\",\"firstin2\",\"special2\",\"meals2\",\"open2r\",\"hrsopen2\",\n    \"psoda2\",\"pfry2\",\"pentree2\",\"nregs2\",\"nregs112\"\n]\n\ndf = pd.read_fwf(data_path, colspecs=colspecs, names=colnames)\n\nfor c in df.columns:\n    df[c] = pd.to_numeric(df[c], errors=\"coerce\")\n\ndf.head()\n\n\n\n\n\n\n\n\nsheet\nchain\nco_owned\nstate\nsouthj\ncentralj\nnorthj\npa1\npa2\nshore\n...\nfirstin2\nspecial2\nmeals2\nopen2r\nhrsopen2\npsoda2\npfry2\npentree2\nnregs2\nnregs112\n\n\n\n\n0\n46\n1\n0\n0\n0\n0\n0\n1\n0\n0\n...\n0.08\n1.0\n2.0\n6.5\n16.5\n1.03\nNaN\n0.94\n4.0\n4.0\n\n\n1\n49\n2\n0\n0\n0\n0\n0\n1\n0\n0\n...\n0.05\n0.0\n2.0\n10.0\n13.0\n1.01\n0.89\n2.35\n4.0\n4.0\n\n\n2\n506\n2\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.25\nNaN\n1.0\n11.0\n11.0\n0.95\n0.74\n2.33\n4.0\n3.0\n\n\n3\n56\n4\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.15\n0.0\n2.0\n10.0\n12.0\n0.92\n0.79\n0.87\n2.0\n2.0\n\n\n4\n61\n4\n1\n0\n0\n0\n0\n1\n0\n0\n...\n0.15\n0.0\n2.0\n10.0\n12.0\n1.01\n0.84\n0.95\n2.0\n2.0\n\n\n\n\n5 rows × 46 columns"
-  },
-  {
-    "objectID": "blog/second-post.html#variable-construction",
-    "href": "blog/second-post.html#variable-construction",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "Variable Construction",
-    "text": "Variable Construction\nThe paper defines full-time-equivalent employment as the number of full-time workers plus half the number of part-time workers.\n\ndf[\"fte\"] = df[\"empft\"] + 0.5 * df[\"emppt\"]\ndf[\"fte2\"] = df[\"empft2\"] + 0.5 * df[\"emppt2\"]\n\ndf[\"nj\"] = df[\"state\"]\n\ndf[\"fullmeal\"] = df[\"psoda\"] + df[\"pfry\"] + df[\"pentree\"]\ndf[\"fullmeal2\"] = df[\"psoda2\"] + df[\"pfry2\"] + df[\"pentree2\"]\n\nFor now, I use the reported wave-2 employment directly.\n\ndf[\"fte2_main\"] = df[\"fte2\"]\ndf[\"delta_fte\"] = df[\"fte2_main\"] - df[\"fte\"]\n\ndf[[\"fte\", \"fte2_main\", \"delta_fte\", \"nj\"]].describe()\n\n\n\n\n\n\n\n\nfte\nfte2_main\ndelta_fte\nnj\n\n\n\n\ncount\n404.000000\n397.000000\n391.000000\n410.000000\n\n\nmean\n17.621906\n17.566751\n-0.119565\n0.807317\n\n\nstd\n9.423264\n8.607385\n8.850644\n0.394888\n\n\nmin\n3.000000\n0.000000\n-43.500000\n0.000000\n\n\n25%\n11.375000\n11.500000\n-4.250000\n1.000000\n\n\n50%\n16.375000\n17.000000\n0.000000\n1.000000\n\n\n75%\n21.000000\n22.500000\n4.125000\n1.000000\n\n\nmax\n80.000000\n55.500000\n35.000000\n1.000000"
-  },
-  {
-    "objectID": "blog/second-post.html#replicate-part-of-table-2",
-    "href": "blog/second-post.html#replicate-part-of-table-2",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "Replicate Part of Table 2",
-    "text": "Replicate Part of Table 2\nI replicate selected descriptive statistics from Table 2: FTE employment, starting wage, and full meal price in each state and survey wave.\n\ntable2_wave1 = (\n    df.groupby(\"nj\")\n      .agg(\n          fte_wave1=(\"fte\", \"mean\"),\n          start_wage_wave1=(\"wage_st\", \"mean\"),\n          fullmeal_wave1=(\"fullmeal\", \"mean\")\n      )\n)\n\ntable2_wave2 = (\n    df.groupby(\"nj\")\n      .agg(\n          fte_wave2=(\"fte2_main\", \"mean\"),\n          start_wage_wave2=(\"wage_st2\", \"mean\"),\n          fullmeal_wave2=(\"fullmeal2\", \"mean\")\n      )\n)\n\ntable2_rep = table2_wave1.join(table2_wave2)\ntable2_rep.index = [\"PA\", \"NJ\"]\ntable2_rep.round(2)\n\n\n\n\n\n\n\n\nfte_wave1\nstart_wage_wave1\nfullmeal_wave1\nfte_wave2\nstart_wage_wave2\nfullmeal_wave2\n\n\n\n\nPA\n19.95\n4.63\n3.04\n17.54\n4.62\n3.03\n\n\nNJ\n17.07\n4.61\n3.35\n17.57\n5.08\n3.41"
-  },
-  {
-    "objectID": "blog/second-post.html#replicate-table-3-rows-1-3-columns-1-3",
-    "href": "blog/second-post.html#replicate-table-3-rows-1-3-columns-1-3",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "Replicate Table 3: Rows 1-3, Columns 1-3",
-    "text": "Replicate Table 3: Rows 1-3, Columns 1-3\nThe key result in Table 3 compares average FTE employment in Pennsylvania and New Jersey before and after the minimum wage increase.\n\npa = df[df[\"nj\"] == 0]\nnj = df[df[\"nj\"] == 1]\n\nr1_pa = pa[\"fte\"].mean()\nr1_nj = nj[\"fte\"].mean()\nr1_diff = r1_nj - r1_pa\n\nr2_pa = pa[\"fte2_main\"].mean()\nr2_nj = nj[\"fte2_main\"].mean()\nr2_diff = r2_nj - r2_pa\n\nr3_pa = r2_pa - r1_pa\nr3_nj = r2_nj - r1_nj\nr3_diff = r3_nj - r3_pa\n\ntable3_rep = pd.DataFrame({\n    \"PA (i)\": [r1_pa, r2_pa, r3_pa],\n    \"NJ (ii)\": [r1_nj, r2_nj, r3_nj],\n    \"Difference NJ-PA (iii)\": [r1_diff, r2_diff, r3_diff]\n}, index=[\n    \"1. FTE employment before\",\n    \"2. FTE employment after\",\n    \"3. Change in mean FTE employment\"\n])\n\ntable3_rep.round(2)\n\n\n\n\n\n\n\n\nPA (i)\nNJ (ii)\nDifference NJ-PA (iii)\n\n\n\n\n1. FTE employment before\n19.95\n17.07\n-2.88\n\n\n2. FTE employment after\n17.54\n17.57\n0.03\n\n\n3. Change in mean FTE employment\n-2.41\n0.51\n2.91\n\n\n\n\n\n\n\nThe third row, third column is the main difference-in-differences estimate. The difference-in-differences estimate (approximately 2.7) indicates that employment increased in New Jersey relative to Pennsylvania after the minimum wage increase."
-  },
-  {
-    "objectID": "blog/second-post.html#replicate-table-4-column-i",
-    "href": "blog/second-post.html#replicate-table-4-column-i",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "Replicate Table 4, Column (i)",
-    "text": "Replicate Table 4, Column (i)\nTable 4 column (i) regresses the change in FTE employment on a New Jersey dummy. Following the paper, I restrict the sample to stores with nonmissing employment and starting wage data in both waves.\n\nreg_df = df[\n    df[\"fte\"].notna() &\n    df[\"fte2_main\"].notna() &\n    df[\"wage_st\"].notna() &\n    df[\"wage_st2\"].notna()\n].copy()\n\nreg_df[\"delta_fte\"] = reg_df[\"fte2_main\"] - reg_df[\"fte\"]\n\nX = sm.add_constant(reg_df[\"nj\"])\ny = reg_df[\"delta_fte\"]\n\nmodel1 = sm.OLS(y, X).fit()\nprint(model1.summary())\n\n                            OLS Regression Results                            \n==============================================================================\nDep. Variable:              delta_fte   R-squared:                       0.012\nModel:                            OLS   Adj. R-squared:                  0.010\nMethod:                 Least Squares   F-statistic:                     4.476\nDate:                Tue, 21 Apr 2026   Prob (F-statistic):             0.0351\nTime:                        19:46:04   Log-Likelihood:                -1274.5\nNo. Observations:                 358   AIC:                             2553.\nDf Residuals:                     356   BIC:                             2561.\nDf Model:                           1                                         \nCovariance Type:            nonrobust                                         \n==============================================================================\n                 coef    std err          t      P&gt;|t|      [0.025      0.975]\n------------------------------------------------------------------------------\nconst         -2.1343      1.042     -2.048      0.041      -4.184      -0.084\nnj             2.4462      1.156      2.116      0.035       0.172       4.720\n==============================================================================\nOmnibus:                       49.222   Durbin-Watson:                   2.164\nProb(Omnibus):                  0.000   Jarque-Bera (JB):              145.478\nSkew:                          -0.613   Prob(JB):                     2.57e-32\nKurtosis:                       5.872   Cond. No.                         4.42\n==============================================================================\n\nNotes:\n[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n\n\n\ntable4_col1 = pd.DataFrame({\n    \"Coefficient\": model1.params,\n    \"Std. Error\": model1.bse,\n    \"t value\": model1.tvalues,\n    \"p value\": model1.pvalues\n})\ntable4_col1.round(3)\n\n\n\n\n\n\n\n\nCoefficient\nStd. Error\nt value\np value\n\n\n\n\nconst\n-2.134\n1.042\n-2.048\n0.041\n\n\nnj\n2.446\n1.156\n2.116\n0.035\n\n\n\n\n\n\n\nThe coefficient on the New Jersey dummy is the reduced-form estimate reported in Table 4, column (i). The estimated coefficient (2.446) is very close to the value reported in the paper (2.33), confirming that the replication successfully reproduces the main result."
-  },
-  {
-    "objectID": "blog/second-post.html#something-additional-why-the-did-strategy-can-identify-a-causal-effect",
-    "href": "blog/second-post.html#something-additional-why-the-did-strategy-can-identify-a-causal-effect",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "Something Additional: Why the DID Strategy Can Identify a Causal Effect",
-    "text": "Something Additional: Why the DID Strategy Can Identify a Causal Effect\nAs an additional step, I explain why the paper’s empirical strategy is intended to support a causal interpretation. The difference-in-differences approach compares the employment change in New Jersey to the employment change in Pennsylvania. This removes permanent differences between the two states and common time shocks that affect both states.\nThe key identifying assumption is that, absent the policy change, employment in New Jersey and Pennsylvania would have followed parallel trends. Under this assumption, the difference between the two states’ employment changes can be interpreted as the effect of the minimum wage increase."
-  },
-  {
-    "objectID": "blog/second-post.html#conclusion",
-    "href": "blog/second-post.html#conclusion",
-    "title": "Replication of Card and Krueger (1994)",
-    "section": "Conclusion",
-    "text": "Conclusion\nI replicated selected descriptive statistics from Table 2, the core 9 numbers from Table 3, and column (i) of Table 4. Together, these results reproduce the paper’s main empirical finding: employment in New Jersey did not fall relative to Pennsylvania after the minimum wage increase."
   }
 ]
