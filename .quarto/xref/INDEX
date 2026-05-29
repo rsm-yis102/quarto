@@ -22,5 +22,9 @@
   },
   "blog/Third-post.qmd": {
     "Third-post.html": "c64ddd8b"
+  },
+  "blog/Four-post.qmd": {
+    "Four-post.html": "3b5f0861",
+    "Four-post.docx": "1e74a89f"
   }
 }
