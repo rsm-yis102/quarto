@@ -319,8 +319,8 @@ window.Quarto = {
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
 <span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>n_valid   <span class="ot">&lt;-</span> <span class="fu">sum</span>(check<span class="sc">$</span>n_best <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> check<span class="sc">$</span>n_worst <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> check<span class="sc">$</span>n_zero <span class="sc">==</span> <span class="dv">2</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>n_total   <span class="ot">&lt;-</span> <span class="fu">nrow</span>(check)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>n_valid <span class="ot">&lt;-</span> <span class="fu">sum</span>(check<span class="sc">$</span>n_best <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> check<span class="sc">$</span>n_worst <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> check<span class="sc">$</span>n_zero <span class="sc">==</span> <span class="dv">2</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>n_total <span class="ot">&lt;-</span> <span class="fu">nrow</span>(check)</span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Total tasks:"</span>, n_total, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
@@ -345,7 +345,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only tasks that are structurally complete (exactly 1 best, 1 worst, 2 neutral)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only tasks that are structurally complete</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>valid_tasks <span class="ot">&lt;-</span> check <span class="sc">|&gt;</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_best <span class="sc">==</span> <span class="dv">1</span>, n_worst <span class="sc">==</span> <span class="dv">1</span>, n_zero <span class="sc">==</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(resp_id, task)</span>
@@ -672,7 +672,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>The chart reveals a clear preference hierarchy. MGTA 495 Marketing Analytics ranks at the top by a wide margin (score = 0.567), while MGTA 444 Analytics Consulting ranks at the bottom (score = −0.155). The confidence intervals for the top and bottom items do not overlap with those in the middle, confirming these rankings are not driven by chance.</p>
+<p>The chart reveals a clear preference hierarchy. MGTA 495 Marketing Analytics ranks at the top by a wide margin (score = 0.493), while MGTA 444 Analytics Consulting ranks at the bottom (score = −0.292). The confidence intervals for the top and bottom items do not overlap with those in the middle, confirming these rankings are not driven by chance.</p>
 </section>
 <section id="from-maxdiff-data-to-mnl-choices" class="level2">
 <h2 class="anchored" data-anchor-id="from-maxdiff-data-to-mnl-choices">From MaxDiff Data to MNL Choices</h2>
@@ -925,7 +925,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 </div>
 </div>
 </div>
-<p>The MLE ranking closely mirrors the counts analysis — MGTA 495 Marketing Analytics is the most preferred class by a large margin, and MGTA 444 Analytics Consulting is the least preferred. Differences from the counts analysis appear in the middle tier, where the MNL makes more efficient use of the data: every task where an item was <em>shown but not picked</em> contributes evidence about its relative utility.</p>
+<p>The MLE ranking closely mirrors the counts analysis — MGTA 495 Marketing Analytics is the most preferred class by a large margin (share = 0.2839), and MGTA 444 Analytics Consulting is the least preferred (share = 0.0438). Differences from the counts analysis appear in the middle tier, where the MNL makes more efficient use of the data: every task where an item was <em>shown but not picked</em> contributes evidence about its relative utility.</p>
 </section>
 <section id="mnl-via-bayesian-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="mnl-via-bayesian-estimation">MNL via Bayesian Estimation</h2>
@@ -974,13 +974,13 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>mcmc_out <span class="ot">&lt;-</span> <span class="fu">mh</span>(</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta0    =</span> out<span class="sc">$</span>par,</span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_iter   =</span> <span class="dv">20000</span>,</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">step     =</span> <span class="fl">0.8</span>,</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">step     =</span> <span class="fl">0.15</span>,      <span class="co"># tuned for ~25-40% acceptance rate</span></span>
 <span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">tasks_df =</span> tasks</span>
 <span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Acceptance rate:"</span>, <span class="fu">round</span>(mcmc_out<span class="sc">$</span>accept_rate <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">"%</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Acceptance rate: 0 %</code></pre>
+<pre><code>Acceptance rate: 6.2 %</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1051,10 +1051,10 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <colgroup>
 <col style="width: 2%">
 <col style="width: 4%">
-<col style="width: 63%">
+<col style="width: 64%">
 <col style="width: 9%">
 <col style="width: 6%">
-<col style="width: 6%">
+<col style="width: 5%">
 <col style="width: 6%">
 </colgroup>
 <thead>
@@ -1073,64 +1073,64 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: left;">9</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: left;">MGTA 495 Marketing Analytics (Spring with Yavorsky)</td>
-<td style="text-align: right;">1.630</td>
-<td style="text-align: right;">1.630</td>
-<td style="text-align: right;">1.630</td>
-<td style="text-align: right;">0.2839</td>
+<td style="text-align: right;">1.619</td>
+<td style="text-align: right;">1.321</td>
+<td style="text-align: right;">1.958</td>
+<td style="text-align: right;">0.2847</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">5</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: left;">MGTA 453 Business Analytics (Fall with August)</td>
-<td style="text-align: right;">0.744</td>
-<td style="text-align: right;">0.744</td>
-<td style="text-align: right;">0.744</td>
-<td style="text-align: right;">0.1171</td>
+<td style="text-align: right;">0.737</td>
+<td style="text-align: right;">0.425</td>
+<td style="text-align: right;">1.025</td>
+<td style="text-align: right;">0.1179</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">7</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: left;">MGTA 455 Customer Analytics (Winter with Nijs)</td>
-<td style="text-align: right;">0.656</td>
-<td style="text-align: right;">0.656</td>
-<td style="text-align: right;">0.656</td>
-<td style="text-align: right;">0.1072</td>
+<td style="text-align: right;">0.636</td>
+<td style="text-align: right;">0.342</td>
+<td style="text-align: right;">0.941</td>
+<td style="text-align: right;">0.1066</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">4</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">MGTA 452 Large Data (Fall with Hansen)</td>
-<td style="text-align: right;">0.555</td>
-<td style="text-align: right;">0.555</td>
-<td style="text-align: right;">0.555</td>
-<td style="text-align: right;">0.0969</td>
+<td style="text-align: right;">0.535</td>
+<td style="text-align: right;">0.245</td>
+<td style="text-align: right;">0.853</td>
+<td style="text-align: right;">0.0964</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">8</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: left;">MGTA 454 Capstone Project (Spring with Advisor)</td>
-<td style="text-align: right;">0.443</td>
-<td style="text-align: right;">0.443</td>
-<td style="text-align: right;">0.443</td>
-<td style="text-align: right;">0.0867</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">2</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">MGTA 464 SQL (Summer with Nijs)</td>
-<td style="text-align: right;">0.438</td>
-<td style="text-align: right;">0.438</td>
-<td style="text-align: right;">0.438</td>
-<td style="text-align: right;">0.0862</td>
+<td style="text-align: right;">0.425</td>
+<td style="text-align: right;">0.170</td>
+<td style="text-align: right;">0.718</td>
+<td style="text-align: right;">0.0863</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: left;">MGTA 454 Capstone Project (Spring with Advisor)</td>
+<td style="text-align: right;">0.419</td>
+<td style="text-align: right;">0.163</td>
+<td style="text-align: right;">0.719</td>
+<td style="text-align: right;">0.0859</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">10</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: left;">MGTA 457 Biz. Intelligence Systems (Fall with Schibler)</td>
-<td style="text-align: right;">0.236</td>
-<td style="text-align: right;">0.236</td>
-<td style="text-align: right;">0.236</td>
-<td style="text-align: right;">0.0704</td>
+<td style="text-align: right;">0.211</td>
+<td style="text-align: right;">-0.048</td>
+<td style="text-align: right;">0.488</td>
+<td style="text-align: right;">0.0698</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">1</td>
@@ -1139,25 +1139,25 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">0.000</td>
 <td style="text-align: right;">0.000</td>
 <td style="text-align: right;">0.000</td>
-<td style="text-align: right;">0.0556</td>
+<td style="text-align: right;">0.0565</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">3</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">MGTA 451 Marketing/Finance/Operations (Summer with Wilbur/Buti/Shin)</td>
-<td style="text-align: right;">-0.067</td>
-<td style="text-align: right;">-0.067</td>
-<td style="text-align: right;">-0.067</td>
-<td style="text-align: right;">0.0520</td>
+<td style="text-align: right;">-0.077</td>
+<td style="text-align: right;">-0.355</td>
+<td style="text-align: right;">0.191</td>
+<td style="text-align: right;">0.0523</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">6</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: left;">MGTA 444 Analytics Consulting (Winter with Peterson)</td>
-<td style="text-align: right;">-0.239</td>
-<td style="text-align: right;">-0.239</td>
-<td style="text-align: right;">-0.239</td>
-<td style="text-align: right;">0.0438</td>
+<td style="text-align: right;">-0.261</td>
+<td style="text-align: right;">-0.535</td>
+<td style="text-align: right;">0.026</td>
+<td style="text-align: right;">0.0435</td>
 </tr>
 </tbody>
 </table>
@@ -1237,64 +1237,64 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: left;">MGTA 464 SQL (Summer with Nijs)</td>
 <td style="text-align: right;">0.438</td>
 <td style="text-align: right;">0.137</td>
-<td style="text-align: right;">0.438</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.425</td>
+<td style="text-align: right;">0.139</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">MGTA 451 Marketing/Finance/Operations (Summer with Wilbur/Buti/Shin)</td>
 <td style="text-align: right;">-0.067</td>
 <td style="text-align: right;">0.139</td>
-<td style="text-align: right;">-0.067</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">-0.077</td>
+<td style="text-align: right;">0.149</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MGTA 452 Large Data (Fall with Hansen)</td>
 <td style="text-align: right;">0.555</td>
 <td style="text-align: right;">0.140</td>
-<td style="text-align: right;">0.555</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.535</td>
+<td style="text-align: right;">0.145</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">MGTA 453 Business Analytics (Fall with August)</td>
 <td style="text-align: right;">0.744</td>
 <td style="text-align: right;">0.142</td>
-<td style="text-align: right;">0.744</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.737</td>
+<td style="text-align: right;">0.147</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MGTA 444 Analytics Consulting (Winter with Peterson)</td>
 <td style="text-align: right;">-0.239</td>
 <td style="text-align: right;">0.141</td>
-<td style="text-align: right;">-0.239</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">-0.261</td>
+<td style="text-align: right;">0.141</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">MGTA 455 Customer Analytics (Winter with Nijs)</td>
 <td style="text-align: right;">0.656</td>
 <td style="text-align: right;">0.142</td>
-<td style="text-align: right;">0.656</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.636</td>
+<td style="text-align: right;">0.147</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MGTA 454 Capstone Project (Spring with Advisor)</td>
 <td style="text-align: right;">0.443</td>
 <td style="text-align: right;">0.140</td>
-<td style="text-align: right;">0.443</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.419</td>
+<td style="text-align: right;">0.141</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">MGTA 495 Marketing Analytics (Spring with Yavorsky)</td>
 <td style="text-align: right;">1.630</td>
 <td style="text-align: right;">0.146</td>
-<td style="text-align: right;">1.630</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.619</td>
+<td style="text-align: right;">0.157</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MGTA 457 Biz. Intelligence Systems (Fall with Schibler)</td>
 <td style="text-align: right;">0.236</td>
 <td style="text-align: right;">0.137</td>
-<td style="text-align: right;">0.236</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.211</td>
+<td style="text-align: right;">0.143</td>
 </tr>
 </tbody>
 </table>
@@ -1354,7 +1354,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0.2839</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.2839</td>
+<td style="text-align: right;">0.2847</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
@@ -1363,7 +1363,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0.1171</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">0.1171</td>
+<td style="text-align: right;">0.1179</td>
 <td style="text-align: right;">2</td>
 </tr>
 <tr class="odd">
@@ -1372,7 +1372,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">0.1072</td>
 <td style="text-align: right;">3</td>
-<td style="text-align: right;">0.1072</td>
+<td style="text-align: right;">0.1066</td>
 <td style="text-align: right;">3</td>
 </tr>
 <tr class="even">
@@ -1381,7 +1381,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">0.0969</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">0.0969</td>
+<td style="text-align: right;">0.0964</td>
 <td style="text-align: right;">4</td>
 </tr>
 <tr class="odd">
@@ -1390,8 +1390,8 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">0.0867</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">0.0867</td>
-<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.0859</td>
+<td style="text-align: right;">6</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MGTA 464 SQL (Summer with Nijs)</td>
@@ -1399,8 +1399,8 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">0.0862</td>
 <td style="text-align: right;">6</td>
-<td style="text-align: right;">0.0862</td>
-<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.0863</td>
+<td style="text-align: right;">5</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">MGTA 457 Biz. Intelligence Systems (Fall with Schibler)</td>
@@ -1408,7 +1408,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">0.0704</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">0.0704</td>
+<td style="text-align: right;">0.0698</td>
 <td style="text-align: right;">7</td>
 </tr>
 <tr class="even">
@@ -1417,7 +1417,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">0.0556</td>
 <td style="text-align: right;">8</td>
-<td style="text-align: right;">0.0556</td>
+<td style="text-align: right;">0.0565</td>
 <td style="text-align: right;">8</td>
 </tr>
 <tr class="odd">
@@ -1426,7 +1426,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">0.0520</td>
 <td style="text-align: right;">9</td>
-<td style="text-align: right;">0.0520</td>
+<td style="text-align: right;">0.0523</td>
 <td style="text-align: right;">9</td>
 </tr>
 <tr class="even">
@@ -1435,7 +1435,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">0.0438</td>
 <td style="text-align: right;">10</td>
-<td style="text-align: right;">0.0438</td>
+<td style="text-align: right;">0.0435</td>
 <td style="text-align: right;">10</td>
 </tr>
 </tbody>
@@ -1496,7 +1496,7 @@ P(\text{worst} = c \mid \text{best} = b) \;=\; \frac{\exp(-\beta_c)}{\exp(-\beta
 </section>
 <section id="discussion" class="level2">
 <h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
-<p>Across all three methods, the analysis reveals a consistent and interpretable preference hierarchy among the 10 MSBA core classes at UCSD Rady. MGTA 495 Marketing Analytics ranks first by a substantial margin (counts score 0.567, MLE share 0.284), suggesting students strongly value applied, career-facing analytics coursework. MGTA 453 Business Analytics and MGTA 455 Customer Analytics follow in second and third place. At the bottom, MGTA 444 Analytics Consulting (counts score −0.155) and MGTA 451 Marketing/Finance/Operations rank as the least preferred — perhaps because students perceive them as less analytically distinctive or more obligatory in nature.</p>
+<p>Across all three methods, the analysis reveals a consistent and interpretable preference hierarchy among the 10 MSBA core classes at UCSD Rady. MGTA 495 Marketing Analytics ranks first by a substantial margin (counts score 0.493, MLE share 0.284), suggesting students strongly value applied, career-facing analytics coursework. MGTA 453 Business Analytics and MGTA 455 Customer Analytics follow in second and third place. At the bottom, MGTA 444 Analytics Consulting (counts score −0.292) and MGTA 451 Marketing/Finance/Operations rank as the least preferred — perhaps because students perceive them as less analytically distinctive or more obligatory in nature.</p>
 <p>For what kind of question would you reach for each method? Counts is ideal for a quick executive summary — no modeling assumptions, easy to explain to any audience. MLE provides rigorous point estimates with classical standard errors, the right tool when a single number needs to be reported. Bayesian inference shines when uncertainty on derived quantities matters: shares of preference, pairwise probability statements, or market simulations are all trivial to compute from MCMC draws without relying on approximations like the delta method.</p>
 <p>Several caveats apply. The survey was administered to a self-selected sample of current MSBA students; preferences may not generalize to prospective students, alumni, or future cohorts. Item presentation order, prior coursework, and current standing in the program may all affect responses in ways we cannot disentangle from the data.</p>
 <p>If I had more time, I would extend the model to a hierarchical (mixed) MNL that treats each respondent’s <span class="math inline">\(\boldsymbol{\beta}_i\)</span> as a draw from a shared multivariate normal population distribution. This would reveal preference heterogeneity across students — for example, whether students in different specialization tracks value different classes — and produce more accurate individual-level utility estimates.</p>

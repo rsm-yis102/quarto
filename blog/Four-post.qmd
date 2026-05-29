@@ -10,6 +10,7 @@ format:
 ---
 
 
+
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(knitr)
@@ -77,8 +78,8 @@ check <- choices |>
     .groups = "drop"
   )
 
-n_valid   <- sum(check$n_best == 1 & check$n_worst == 1 & check$n_zero == 2)
-n_total   <- nrow(check)
+n_valid <- sum(check$n_best == 1 & check$n_worst == 1 & check$n_zero == 2)
+n_total <- nrow(check)
 
 cat("Total tasks:", n_total, "\n")
 cat("Tasks with exactly 1 best, 1 worst, 2 neutral:", n_valid, "\n")
@@ -86,7 +87,7 @@ cat("Tasks with anomalies:", n_total - n_valid, "\n")
 ```
 
 ```{r filter-valid-tasks}
-# Keep only tasks that are structurally complete (exactly 1 best, 1 worst, 2 neutral)
+# Keep only tasks that are structurally complete
 valid_tasks <- check |>
   filter(n_best == 1, n_worst == 1, n_zero == 2) |>
   select(resp_id, task)
@@ -190,7 +191,7 @@ ggplot(plot_counts,
   theme_minimal(base_size = 12)
 ```
 
-The chart reveals a clear preference hierarchy. MGTA 495 Marketing Analytics ranks at the top by a wide margin (score = 0.567), while MGTA 444 Analytics Consulting ranks at the bottom (score = −0.155). The confidence intervals for the top and bottom items do not overlap with those in the middle, confirming these rankings are not driven by chance.
+The chart reveals a clear preference hierarchy. MGTA 495 Marketing Analytics ranks at the top by a wide margin (score = 0.493), while MGTA 444 Analytics Consulting ranks at the bottom (score = −0.292). The confidence intervals for the top and bottom items do not overlap with those in the middle, confirming these rankings are not driven by chance.
 
 ## From MaxDiff Data to MNL Choices
 
@@ -303,7 +304,7 @@ ggplot(mle_df,
   theme_minimal(base_size = 12)
 ```
 
-The MLE ranking closely mirrors the counts analysis — MGTA 495 Marketing Analytics is the most preferred class by a large margin, and MGTA 444 Analytics Consulting is the least preferred. Differences from the counts analysis appear in the middle tier, where the MNL makes more efficient use of the data: every task where an item was *shown but not picked* contributes evidence about its relative utility.
+The MLE ranking closely mirrors the counts analysis — MGTA 495 Marketing Analytics is the most preferred class by a large margin (share = 0.2839), and MGTA 444 Analytics Consulting is the least preferred (share = 0.0438). Differences from the counts analysis appear in the middle tier, where the MNL makes more efficient use of the data: every task where an item was *shown but not picked* contributes evidence about its relative utility.
 
 ## MNL via Bayesian Estimation
 
@@ -345,7 +346,7 @@ cat("Running MCMC (20,000 iterations)...\n")
 mcmc_out <- mh(
   beta0    = out$par,
   n_iter   = 20000,
-  step     = 0.8,
+  step     = 0.15,      # tuned for ~25-40% acceptance rate
   tasks_df = tasks
 )
 cat("Acceptance rate:", round(mcmc_out$accept_rate * 100, 1), "%\n")
@@ -496,7 +497,7 @@ What does Bayes add over MLE? The key advantage is easy uncertainty quantificati
 
 ## Discussion
 
-Across all three methods, the analysis reveals a consistent and interpretable preference hierarchy among the 10 MSBA core classes at UCSD Rady. MGTA 495 Marketing Analytics ranks first by a substantial margin (counts score 0.567, MLE share 0.284), suggesting students strongly value applied, career-facing analytics coursework. MGTA 453 Business Analytics and MGTA 455 Customer Analytics follow in second and third place. At the bottom, MGTA 444 Analytics Consulting (counts score −0.155) and MGTA 451 Marketing/Finance/Operations rank as the least preferred — perhaps because students perceive them as less analytically distinctive or more obligatory in nature.
+Across all three methods, the analysis reveals a consistent and interpretable preference hierarchy among the 10 MSBA core classes at UCSD Rady. MGTA 495 Marketing Analytics ranks first by a substantial margin (counts score 0.493, MLE share 0.284), suggesting students strongly value applied, career-facing analytics coursework. MGTA 453 Business Analytics and MGTA 455 Customer Analytics follow in second and third place. At the bottom, MGTA 444 Analytics Consulting (counts score −0.292) and MGTA 451 Marketing/Finance/Operations rank as the least preferred — perhaps because students perceive them as less analytically distinctive or more obligatory in nature.
 
 For what kind of question would you reach for each method? Counts is ideal for a quick executive summary — no modeling assumptions, easy to explain to any audience. MLE provides rigorous point estimates with classical standard errors, the right tool when a single number needs to be reported. Bayesian inference shines when uncertainty on derived quantities matters: shares of preference, pairwise probability statements, or market simulations are all trivial to compute from MCMC draws without relying on approximations like the delta method.
 
