@@ -214,7 +214,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="exploring-the-data">Exploring the Data</h2>
 <section id="loading-the-data" class="level3">
 <h3 class="anchored" data-anchor-id="loading-the-data">Loading the Data</h3>
-<div id="60763eb0" class="cell" data-execution_count="1">
+<div id="31c786fb" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -285,7 +285,7 @@ window.Quarto = {
 </section>
 <section id="comparing-patent-counts" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-patent-counts">Comparing Patent Counts</h3>
-<div id="c9256d03" class="cell" data-execution_count="2">
+<div id="c773bd8a" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -298,7 +298,7 @@ window.Quarto = {
 </section>
 <section id="comparing-group-means" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-group-means">Comparing Group Means</h3>
-<div id="b6057d94" class="cell" data-execution_count="3">
+<div id="9b49e6a8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df.groupby(<span class="st">"iscustomer"</span>)[<span class="st">"patents"</span>].mean()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>iscustomer
@@ -311,7 +311,7 @@ Name: patents, dtype: float64</code></pre>
 </section>
 <section id="comparing-regions" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-regions">Comparing Regions</h3>
-<div id="a8f970ea" class="cell" data-execution_count="4">
+<div id="9051c38b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pd.crosstab(df[<span class="st">"region"</span>], df[<span class="st">"iscustomer"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
@@ -366,7 +366,7 @@ Name: patents, dtype: float64</code></pre>
 </section>
 <section id="comparing-firm-age" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-firm-age">Comparing Firm Age</h3>
-<div id="e176f1e9" class="cell" data-execution_count="5">
+<div id="032fbe89" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -400,7 +400,7 @@ L(\lambda)=\prod_{i=1}^{n}\frac{e^{-\lambda}\lambda^{Y_i}}{Y_i!}
 \]</span></p>
 <section id="coding-the-log-likelihood-function" class="level3">
 <h3 class="anchored" data-anchor-id="coding-the-log-likelihood-function">Coding the Log-Likelihood Function</h3>
-<div id="44ea5aa9" class="cell" data-execution_count="6">
+<div id="cfcc8088" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_loglikelihood(lam, Y):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> np.<span class="bu">sum</span>(</span>
@@ -414,7 +414,7 @@ L(\lambda)=\prod_{i=1}^{n}\frac{e^{-\lambda}\lambda^{Y_i}}{Y_i!}
 </section>
 <section id="plotting-the-log-likelihood" class="level3">
 <h3 class="anchored" data-anchor-id="plotting-the-log-likelihood">Plotting the Log-Likelihood</h3>
-<div id="622fb1b4" class="cell" data-execution_count="7">
+<div id="2a59d87e" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -427,7 +427,7 @@ L(\lambda)=\prod_{i=1}^{n}\frac{e^{-\lambda}\lambda^{Y_i}}{Y_i!}
 </section>
 <section id="finding-the-mle-numerically" class="level3">
 <h3 class="anchored" data-anchor-id="finding-the-mle-numerically">Finding the MLE Numerically</h3>
-<div id="16605e2f" class="cell" data-execution_count="8">
+<div id="12aaf49a" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_ll(lam, Y):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>poisson_loglikelihood(lam[<span class="dv">0</span>], Y)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -445,7 +445,7 @@ L(\lambda)=\prod_{i=1}^{n}\frac{e^{-\lambda}\lambda^{Y_i}}{Y_i!}
 </section>
 <section id="comparing-to-the-sample-mean" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-to-the-sample-mean">Comparing to the Sample Mean</h3>
-<div id="d6d6a7b6" class="cell" data-execution_count="9">
+<div id="bb811e53" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>y.mean()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>np.float64(3.6846666666666668)</code></pre>
@@ -468,7 +468,7 @@ Y_i \sim \text{Poisson}(\lambda_i)
 <p>The exponential function ensures that the expected patent count is always positive.</p>
 <section id="constructing-the-design-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="constructing-the-design-matrix">Constructing the Design Matrix</h3>
-<div id="231bd3e7" class="cell" data-execution_count="10">
+<div id="af3f1bd2" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.get_dummies(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    df,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"region"</span>],</span>
@@ -573,7 +573,7 @@ Y_i \sim \text{Poisson}(\lambda_i)
 </section>
 <section id="coding-the-poisson-regression-log-likelihood" class="level3">
 <h3 class="anchored" data-anchor-id="coding-the-poisson-regression-log-likelihood">Coding the Poisson Regression Log-Likelihood</h3>
-<div id="f3cb2ee8" class="cell" data-execution_count="11">
+<div id="0c5ec774" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_reg_ll(beta, y, X):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    eta <span class="op">=</span> X.to_numpy() <span class="op">@</span> beta</span>
@@ -590,7 +590,7 @@ Y_i \sim \text{Poisson}(\lambda_i)
 </section>
 <section id="estimating-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="estimating-the-model">Estimating the Model</h3>
-<div id="490e4370" class="cell" data-execution_count="12">
+<div id="e0cade5a" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_poisson_reg_ll(beta, y, X):</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>poisson_reg_ll(beta, y, X)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -602,27 +602,27 @@ Y_i \sim \text{Poisson}(\lambda_i)
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>result.x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:4: RuntimeWarning: overflow encountered in exp
+<pre><code>/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:4: RuntimeWarning: overflow encountered in exp
   mu = np.exp(eta)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply
   y.to_numpy()*np.log(mu)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract
   y.to_numpy()*np.log(mu)
 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: overflow encountered in reduce
   return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:4: RuntimeWarning: overflow encountered in exp
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:4: RuntimeWarning: overflow encountered in exp
   mu = np.exp(eta)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply
   y.to_numpy()*np.log(mu)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract
   y.to_numpy()*np.log(mu)
 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: overflow encountered in reduce
   return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:4: RuntimeWarning: overflow encountered in exp
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:4: RuntimeWarning: overflow encountered in exp
   mu = np.exp(eta)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:7: RuntimeWarning: invalid value encountered in multiply
   y.to_numpy()*np.log(mu)
-/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_75100/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract
+/var/folders/g4/6_fvz6kx06l5s3rkzxvjbs0c0000gn/T/ipykernel_89547/2863719832.py:7: RuntimeWarning: invalid value encountered in subtract
   y.to_numpy()*np.log(mu)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="12">
@@ -633,7 +633,7 @@ Y_i \sim \text{Poisson}(\lambda_i)
 </section>
 <section id="comparing-to-statsmodels-glm" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-to-statsmodels-glm">Comparing to Statsmodels GLM</h3>
-<div id="8c0c4a8f" class="cell" data-execution_count="13">
+<div id="c2e3437f" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>glm_model <span class="op">=</span> sm.GLM(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    y,</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    X,</span>
@@ -649,8 +649,8 @@ Model:                            GLM   Df Residuals:                     1493
 Model Family:                 Poisson   Df Model:                            6
 Link Function:                    Log   Scale:                          1.0000
 Method:                          IRLS   Log-Likelihood:                -3258.3
-Date:                Mon, 18 May 2026   Deviance:                       2143.7
-Time:                        18:14:07   Pearson chi2:                 2.08e+03
+Date:                Thu, 28 May 2026   Deviance:                       2143.7
+Time:                        21:11:36   Pearson chi2:                 2.08e+03
 No. Iterations:                     5   Pseudo R-squ. (CS):             0.1357
 Covariance Type:            nonrobust                                         
 ====================================================================================
@@ -677,7 +677,7 @@ age_sq              -0.0030      0.000    -11.567      0.000      -0.003      -0
 <p>The first dataset assumes every firm is a non-customer, while the second assumes every firm is a customer.</p>
 <section id="constructing-counterfactual-predictions" class="level3">
 <h3 class="anchored" data-anchor-id="constructing-counterfactual-predictions">Constructing Counterfactual Predictions</h3>
-<div id="40782445" class="cell" data-execution_count="14">
+<div id="faacbee3" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>X0 <span class="op">=</span> X.copy()</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>X0[<span class="st">"iscustomer"</span>] <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -687,7 +687,7 @@ age_sq              -0.0030      0.000    -11.567      0.000      -0.003      -0
 </section>
 <section id="predicting-patent-counts" class="level3">
 <h3 class="anchored" data-anchor-id="predicting-patent-counts">Predicting Patent Counts</h3>
-<div id="a23880b6" class="cell" data-execution_count="15">
+<div id="cf2f4bf6" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="op">=</span> result.x</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>yhat0 <span class="op">=</span> np.exp(X0 <span class="op">@</span> beta_hat)</span>
