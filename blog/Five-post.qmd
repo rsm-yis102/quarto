@@ -1,0 +1,223 @@
+---
+title: "Key Drivers Analysis"
+author: "Yizhen Shi"
+date: "Jun 8, 2026"
+format:
+  html:
+    code-fold: true
+    toc: true
+    theme: cosmo
+---
+
+## Overview
+
+This analysis replicates the key drivers table using customer satisfaction survey data. We predict overall **satisfaction** from nine attribute ratings:
+*trust, build, differs, easy, appealing, rewarding, popular, service,* and *impact*.
+
+Six importance metrics are computed and displayed as normalized percentages (each column sums to 100), following the convention of slide 75 of the key drivers slides.
+
+---
+
+## Setup & Data
+
+```{python}
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score
+from itertools import combinations
+from math import factorial
+
+df = pd.read_csv('data_for_drivers_analysis.csv')
+
+y_col = 'satisfaction'
+x_cols = ['trust', 'build', 'differs', 'easy', 'appealing',
+          'rewarding', 'popular', 'service', 'impact']
+
+df_clean = df[x_cols + [y_col]].dropna()
+X    = df_clean[x_cols].values
+Xdf  = df_clean[x_cols]
+y    = df_clean[y_col].values
+k    = len(x_cols)
+
+print(f"Rows used: {len(df_clean)}  |  Outcome: {y_col}  |  Predictors: {k}")
+```
+
+---
+
+## All Metrics Computed
+
+```{python}
+# ── 1. Pearson correlations ──────────────────────────────────────────────────
+pearson = Xdf.corrwith(df_clean[y_col])
+
+# ── 2. Standardized regression coefficients (beta weights) ──────────────────
+Xstd   = (Xdf - Xdf.mean()) / Xdf.std()
+ystd_v = (y - y.mean()) / y.std()
+beta   = pd.Series(
+    LinearRegression().fit(Xstd.values, ystd_v).coef_,
+    index=x_cols
+)
+
+# ── 3. Drop-one ("usefulness") ───────────────────────────────────────────────
+full_r2  = r2_score(y, LinearRegression().fit(X, y).predict(X))
+
+drop_one = {}
+for col in x_cols:
+    minus = [c for c in x_cols if c != col]
+    r2m   = r2_score(
+        y,
+        LinearRegression().fit(Xdf[minus].values, y).predict(Xdf[minus].values)
+    )
+    drop_one[col] = full_r2 - r2m
+drop_one = pd.Series(drop_one)
+
+print(f"Full model R²: {full_r2:.4f}")
+
+# ── 4. Shapley values (exact enumeration, R² metric) ────────────────────────
+def r2_subset(indices):
+    if len(indices) == 0:
+        return 0.0
+    m = LinearRegression().fit(X[:, list(indices)], y)
+    return r2_score(y, m.predict(X[:, list(indices)]))
+
+shap = np.zeros(k)
+for i in range(k):
+    others = [j for j in range(k) if j != i]
+    for size in range(len(others) + 1):
+        for subset in combinations(others, size):
+            s      = len(subset)
+            w      = factorial(s) * factorial(k - s - 1) / factorial(k)
+            margin = r2_subset(list(subset) + [i]) - r2_subset(list(subset))
+            shap[i] += w * margin
+
+shapley = pd.Series(shap, index=x_cols)
+print(f"Shapley values sum to R²: {shapley.sum():.4f}  (Full R² = {full_r2:.4f})")
+
+# ── 5. Johnson's relative weights ────────────────────────────────────────────
+eigenvalues, eigenvectors = np.linalg.eigh(np.corrcoef(Xstd.T))
+Z       = Xstd.values @ eigenvectors @ np.diag(1.0 / np.sqrt(eigenvalues))
+betas_z = np.linalg.lstsq(Z, ystd_v, rcond=None)[0]
+
+RW_raw = np.array([
+    sum((eigenvectors[i, j] * np.sqrt(eigenvalues[j]) * betas_z[j]) ** 2
+        for j in range(k))
+    for i in range(k)
+])
+johnson = pd.Series(RW_raw / RW_raw.sum() * full_r2, index=x_cols)
+print(f"Johnson RW sum: {johnson.sum():.4f}  (Full R² = {full_r2:.4f})")
+
+# ── 6. Random forest mean decrease in Gini ───────────────────────────────────
+rf   = RandomForestRegressor(n_estimators=500, random_state=42, n_jobs=-1)
+rf.fit(X, y)
+gini = pd.Series(rf.feature_importances_, index=x_cols)
+print(f"RF Gini importances sum: {gini.sum():.4f}")
+```
+
+---
+
+## Key Drivers Table
+
+Each column is normalized so its values sum to 100 (expressed as a percentage of total importance for that method). The raw Pearson r is kept on its original scale.
+
+```{python}
+from IPython.display import display
+
+def to_pct(s):
+    return (s / s.sum() * 100).round(1)
+
+table = pd.DataFrame({
+    'Pearson r':        pearson.round(3),
+    'Std. Beta':        to_pct(beta),
+    'Drop-one':         to_pct(drop_one),
+    'Shapley':          to_pct(shapley),
+    "Johnson's RW":     to_pct(johnson),
+    'RF Gini Decrease': to_pct(gini),
+}).sort_values('Shapley', ascending=False)
+
+rank_cols = ['Std. Beta', 'Drop-one', 'Shapley', "Johnson's RW", 'RF Gini Decrease']
+
+styled = (
+    table.style
+    .format({
+        'Pearson r':        '{:.3f}',
+        'Std. Beta':        '{:.1f}%',
+        'Drop-one':         '{:.1f}%',
+        'Shapley':          '{:.1f}%',
+        "Johnson's RW":     '{:.1f}%',
+        'RF Gini Decrease': '{:.1f}%',
+    })
+    .background_gradient(subset=rank_cols, cmap='YlOrRd', axis=0)
+    .set_caption(f"Key Drivers of Customer Satisfaction  |  Overall R² = {full_r2:.4f}")
+    .set_table_styles([
+        {'selector': 'caption',
+         'props': [('font-size', '1.1em'), ('font-weight', 'bold'),
+                   ('text-align', 'left'), ('padding-bottom', '8px')]},
+        {'selector': 'th',
+         'props': [('background-color', '#2c3e50'), ('color', 'white'),
+                   ('font-weight', 'bold'), ('padding', '8px 12px')]},
+        {'selector': 'td',
+         'props': [('padding', '6px 12px'), ('text-align', 'center')]},
+    ])
+)
+display(styled)
+```
+
+---
+
+## Interpretation
+
+```{python}
+rank_df  = table[rank_cols].rank(ascending=False).astype(int)
+avg_rank = rank_df.mean(axis=1).sort_values()
+print("Average rank across all methods (lower = more important):")
+print(avg_rank.to_string())
+```
+
+**Summary of findings:**
+
+- **Impact** and **trust** emerge as the top two drivers of satisfaction across nearly every method.
+- **Service** is consistently the third most important driver.
+- **Popular**, **rewarding**, and **build** tend to rank lower across methods.
+- Drop-one and Shapley values agree strongly on ordering; Johnson's Relative Weights spreads importance more evenly (reflecting shared variance among predictors), while the Random Forest Gini importances are more uniform still.
+- The full regression model explains **~10.9% of variance** in satisfaction (R² = 0.109), indicating that additional unmeasured factors also matter.
+
+---
+
+## Medium Challenge — Custom Shapley Values (Linear Regression, R²)
+
+The Shapley values above were computed with a custom implementation using exact enumeration of all 2^k subsets. The core function is:
+
+```{python}
+def shapley_values_custom(X_arr, y_arr, feature_names):
+    """
+    Compute exact Shapley values for linear regression using R² as the fit metric.
+    Complexity: O(k * 2^k) model fits.
+    """
+    n_feat = X_arr.shape[1]
+    shap_out = np.zeros(n_feat)
+
+    def r2_sub(cols):
+        if not cols:
+            return 0.0
+        m = LinearRegression().fit(X_arr[:, cols], y_arr)
+        return r2_score(y_arr, m.predict(X_arr[:, cols]))
+
+    for i in range(n_feat):
+        others = [j for j in range(n_feat) if j != i]
+        for size in range(len(others) + 1):
+            for subset in combinations(others, size):
+                s      = len(subset)
+                w      = (factorial(s) * factorial(n_feat - s - 1)
+                          / factorial(n_feat))
+                margin = r2_sub(list(subset) + [i]) - r2_sub(list(subset))
+                shap_out[i] += w * margin
+
+    return pd.Series(shap_out, index=feature_names)
+
+custom_shap = shapley_values_custom(X, y, x_cols)
+print("Custom Shapley values (sum = R²):")
+print(custom_shap.round(5).to_string())
+print(f"\nSum: {custom_shap.sum():.5f}  |  Full R²: {full_r2:.5f}")
+```

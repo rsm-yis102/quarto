@@ -1,0 +1,310 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Replication of Card and Krueger (1994)\"\n",
+        "subtitle: \"Minimum Wages and Employment in New Jersey and Pennsylvania\"\n",
+        "author: \"Yizhen Shi\"\n",
+        "date: Apr 21, 2026\n",
+        "\n",
+        "format:\n",
+        "  html:\n",
+        "    toc: true\n",
+        "    theme: cosmo\n",
+        "    code-fold: false\n",
+        "    embed-resources: true\n",
+        "\n",
+        "execute:\n",
+        "  warning: false\n",
+        "  message: false\n",
+        "  echo: true\n",
+        "\n",
+        "jupyter: python3\n",
+        "---\n",
+        "\n",
+        "## Introduction\n",
+        "\n",
+        "Card and Krueger (1994) study whether increasing the minimum wage reduces employment in the fast-food industry. In April 1992, New Jersey raised its minimum wage while neighboring Pennsylvania did not. This policy change creates a natural experiment: New Jersey is the treatment group and Pennsylvania is the control group.\n",
+        "\n",
+        "The paper uses a difference-in-differences design. The main idea is to compare the change in employment in New Jersey before and after the policy change to the corresponding change in Pennsylvania. If the two states would otherwise have followed similar trends, then the difference in these changes can be interpreted as the causal effect of the minimum wage increase.\n",
+        "\n",
+        "In this post, I replicate part of Table 2, the 9 numbers in rows 1-3 and columns 1-3 of Table 3, and column (i) of Table 4.\n",
+        "\n",
+        "## Load Packages and Data"
+      ],
+      "id": "eaa469bf"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "import statsmodels.api as sm\n",
+        "from pathlib import Path"
+      ],
+      "id": "58058c34",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "data_path = Path(\"public.dat\")\n",
+        "print(\"Does public.dat exist?\", data_path.exists())"
+      ],
+      "id": "c91c06af",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "colspecs = [\n",
+        "    (0,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21),\n",
+        "    (22,24),(25,30),(31,36),(37,42),(43,48),(49,54),(55,60),(61,62),(63,68),\n",
+        "    (69,70),(71,76),(77,82),(83,88),(89,94),(95,100),(101,103),(104,106),\n",
+        "    (107,108),(109,110),(111,117),(118,120),(121,126),(127,132),(133,138),\n",
+        "    (139,144),(145,150),(151,156),(157,158),(159,160),(161,166),(167,172),\n",
+        "    (173,178),(179,184),(185,190),(191,193),(194,196)\n",
+        "]\n",
+        "\n",
+        "colnames = [\n",
+        "    \"sheet\",\"chain\",\"co_owned\",\"state\",\n",
+        "    \"southj\",\"centralj\",\"northj\",\"pa1\",\"pa2\",\"shore\",\n",
+        "    \"ncalls\",\"empft\",\"emppt\",\"nmgrs\",\"wage_st\",\"inctime\",\"firstinc\",\"bonus\",\"pctaff\",\n",
+        "    \"meals\",\"open\",\"hrsopen\",\"psoda\",\"pfry\",\"pentree\",\"nregs\",\"nregs11\",\n",
+        "    \"type2\",\"status2\",\"date2\",\"ncalls2\",\"empft2\",\"emppt2\",\"nmgrs2\",\n",
+        "    \"wage_st2\",\"inctime2\",\"firstin2\",\"special2\",\"meals2\",\"open2r\",\"hrsopen2\",\n",
+        "    \"psoda2\",\"pfry2\",\"pentree2\",\"nregs2\",\"nregs112\"\n",
+        "]\n",
+        "\n",
+        "df = pd.read_fwf(data_path, colspecs=colspecs, names=colnames)\n",
+        "\n",
+        "for c in df.columns:\n",
+        "    df[c] = pd.to_numeric(df[c], errors=\"coerce\")\n",
+        "\n",
+        "df.head()"
+      ],
+      "id": "fa88857b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Variable Construction\n",
+        "\n",
+        "The paper defines full-time-equivalent employment as the number of full-time workers plus half the number of part-time workers."
+      ],
+      "id": "f3ff6526"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "df[\"fte\"] = df[\"empft\"] + 0.5 * df[\"emppt\"]\n",
+        "df[\"fte2\"] = df[\"empft2\"] + 0.5 * df[\"emppt2\"]\n",
+        "\n",
+        "df[\"nj\"] = df[\"state\"]\n",
+        "\n",
+        "df[\"fullmeal\"] = df[\"psoda\"] + df[\"pfry\"] + df[\"pentree\"]\n",
+        "df[\"fullmeal2\"] = df[\"psoda2\"] + df[\"pfry2\"] + df[\"pentree2\"]"
+      ],
+      "id": "8e77290c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "For now, I use the reported wave-2 employment directly."
+      ],
+      "id": "4ed961c5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "df[\"fte2_main\"] = df[\"fte2\"]\n",
+        "df[\"delta_fte\"] = df[\"fte2_main\"] - df[\"fte\"]\n",
+        "\n",
+        "df[[\"fte\", \"fte2_main\", \"delta_fte\", \"nj\"]].describe()"
+      ],
+      "id": "e882fac3",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Replicate Part of Table 2\n",
+        "\n",
+        "I replicate selected descriptive statistics from Table 2: FTE employment, starting wage, and full meal price in each state and survey wave."
+      ],
+      "id": "03547a16"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "table2_wave1 = (\n",
+        "    df.groupby(\"nj\")\n",
+        "      .agg(\n",
+        "          fte_wave1=(\"fte\", \"mean\"),\n",
+        "          start_wage_wave1=(\"wage_st\", \"mean\"),\n",
+        "          fullmeal_wave1=(\"fullmeal\", \"mean\")\n",
+        "      )\n",
+        ")\n",
+        "\n",
+        "table2_wave2 = (\n",
+        "    df.groupby(\"nj\")\n",
+        "      .agg(\n",
+        "          fte_wave2=(\"fte2_main\", \"mean\"),\n",
+        "          start_wage_wave2=(\"wage_st2\", \"mean\"),\n",
+        "          fullmeal_wave2=(\"fullmeal2\", \"mean\")\n",
+        "      )\n",
+        ")\n",
+        "\n",
+        "table2_rep = table2_wave1.join(table2_wave2)\n",
+        "table2_rep.index = [\"PA\", \"NJ\"]\n",
+        "table2_rep.round(2)"
+      ],
+      "id": "0d5448c3",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Replicate Table 3: Rows 1-3, Columns 1-3\n",
+        "\n",
+        "The key result in Table 3 compares average FTE employment in Pennsylvania and New Jersey before and after the minimum wage increase."
+      ],
+      "id": "224096f6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pa = df[df[\"nj\"] == 0]\n",
+        "nj = df[df[\"nj\"] == 1]\n",
+        "\n",
+        "r1_pa = pa[\"fte\"].mean()\n",
+        "r1_nj = nj[\"fte\"].mean()\n",
+        "r1_diff = r1_nj - r1_pa\n",
+        "\n",
+        "r2_pa = pa[\"fte2_main\"].mean()\n",
+        "r2_nj = nj[\"fte2_main\"].mean()\n",
+        "r2_diff = r2_nj - r2_pa\n",
+        "\n",
+        "r3_pa = r2_pa - r1_pa\n",
+        "r3_nj = r2_nj - r1_nj\n",
+        "r3_diff = r3_nj - r3_pa\n",
+        "\n",
+        "table3_rep = pd.DataFrame({\n",
+        "    \"PA (i)\": [r1_pa, r2_pa, r3_pa],\n",
+        "    \"NJ (ii)\": [r1_nj, r2_nj, r3_nj],\n",
+        "    \"Difference NJ-PA (iii)\": [r1_diff, r2_diff, r3_diff]\n",
+        "}, index=[\n",
+        "    \"1. FTE employment before\",\n",
+        "    \"2. FTE employment after\",\n",
+        "    \"3. Change in mean FTE employment\"\n",
+        "])\n",
+        "\n",
+        "table3_rep.round(2)"
+      ],
+      "id": "b53298ba",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The third row, third column is the main difference-in-differences estimate. The difference-in-differences estimate (approximately 2.7) indicates that employment increased in New Jersey relative to Pennsylvania after the minimum wage increase.\n",
+        "\n",
+        "## Replicate Table 4, Column (i)\n",
+        "\n",
+        "Table 4 column (i) regresses the change in FTE employment on a New Jersey dummy. Following the paper, I restrict the sample to stores with nonmissing employment and starting wage data in both waves."
+      ],
+      "id": "27a08ac6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "reg_df = df[\n",
+        "    df[\"fte\"].notna() &\n",
+        "    df[\"fte2_main\"].notna() &\n",
+        "    df[\"wage_st\"].notna() &\n",
+        "    df[\"wage_st2\"].notna()\n",
+        "].copy()\n",
+        "\n",
+        "reg_df[\"delta_fte\"] = reg_df[\"fte2_main\"] - reg_df[\"fte\"]\n",
+        "\n",
+        "X = sm.add_constant(reg_df[\"nj\"])\n",
+        "y = reg_df[\"delta_fte\"]\n",
+        "\n",
+        "model1 = sm.OLS(y, X).fit()\n",
+        "print(model1.summary())"
+      ],
+      "id": "c27cb249",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "table4_col1 = pd.DataFrame({\n",
+        "    \"Coefficient\": model1.params,\n",
+        "    \"Std. Error\": model1.bse,\n",
+        "    \"t value\": model1.tvalues,\n",
+        "    \"p value\": model1.pvalues\n",
+        "})\n",
+        "table4_col1.round(3)"
+      ],
+      "id": "3e5955f3",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The coefficient on the New Jersey dummy is the reduced-form estimate reported in Table 4, column (i). The estimated coefficient (2.446) is very close to the value reported in the paper (2.33), confirming that the replication successfully reproduces the main result.\n",
+        "\n",
+        "## Something Additional: Why the DID Strategy Can Identify a Causal Effect\n",
+        "\n",
+        "As an additional step, I explain why the paper’s empirical strategy is intended to support a causal interpretation. The difference-in-differences approach compares the employment change in New Jersey to the employment change in Pennsylvania. This removes permanent differences between the two states and common time shocks that affect both states.\n",
+        "\n",
+        "The key identifying assumption is that, absent the policy change, employment in New Jersey and Pennsylvania would have followed parallel trends. Under this assumption, the difference between the two states’ employment changes can be interpreted as the effect of the minimum wage increase.\n",
+        "\n",
+        "## Conclusion\n",
+        "\n",
+        "I replicated selected descriptive statistics from Table 2, the core 9 numbers from Table 3, and column (i) of Table 4. Together, these results reproduce the paper’s main empirical finding: employment in New Jersey did not fall relative to Pennsylvania after the minimum wage increase."
+      ],
+      "id": "45d978d5"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Library/Frameworks/Python.framework/Versions/3.14/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
